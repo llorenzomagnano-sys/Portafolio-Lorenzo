@@ -1,0 +1,50 @@
+{
+  "obtenido_por": "usuario (descarga manual desde su navegador, no por scripts/download_ipc.py)",
+  "motivo": "el entorno de desarrollo no tiene acceso de salida (egress) a indec.gob.ar ni a otros dominios externos",
+  "fecha_incorporacion_al_repo": "2026-08-20",
+  "archivos": [
+    {
+      "archivo": "serie_ipc_divisiones.csv",
+      "fuente": "INDEC, https://www.indec.gob.ar/ftp/cuadros/economia/serie_ipc_divisiones.csv",
+      "descripcion": "IPC por división de consumo y región, metodología vigente desde dic-2016. Incluye Region=\"Nacional\", Codigo=0 \"NIVEL GENERAL\".",
+      "cobertura": "diciembre 2016 - julio 2026 (mensual)",
+      "usado_en_nucleo_1": true,
+      "uso": "deflactor de la serie de coparticipación 2016-2025 (promedio anual de Region=Nacional, Nivel General)"
+    },
+    {
+      "archivo": "serie_ipc_aperturas.csv",
+      "fuente": "INDEC, https://www.indec.gob.ar/ftp/cuadros/economia/serie_ipc_aperturas.csv",
+      "descripcion": "IPC por apertura de consumo y región, mismo período que divisiones.csv.",
+      "usado_en_nucleo_1": false,
+      "uso": "no se usó, alcanza con serie_ipc_divisiones.csv para el nivel general nacional"
+    },
+    {
+      "archivo": "ipc_transicion_abr_nov_2016.xls",
+      "fuente": "INDEC, https://www.indec.gob.ar/ftp/cuadros/economia/sh_ipc_12_16.xls",
+      "descripcion": "Serie transicional del IPC, cubre únicamente abril-noviembre 2016 (base abril 2016=100). No es la serie histórica 2003-2016 que el nombre del archivo sugiere.",
+      "usado_en_nucleo_1": false,
+      "uso": "descartado: no aporta cobertura adicional relevante al alcance 2016-2025 definido para este núcleo (la serie moderna de INDEC ya cubre desde dic-2016)"
+    },
+    {
+      "archivo": "no_usado_FPCPITOTLZGARG_worldbank_2018_2024.csv",
+      "fuente": "FRED (Federal Reserve Bank of St. Louis), serie FPCPITOTLZGARG, originalmente Banco Mundial (World Development Indicators)",
+      "descripcion": "Inflación anual (%) de Argentina, 2018-2024.",
+      "usado_en_nucleo_1": false,
+      "uso": "descartado: alcance temporal insuficiente para tapar el hueco 2003-2016 que se buscaba cubrir originalmente; quedó irrelevante al acotar el núcleo a 2016-2025"
+    },
+    {
+      "archivo": "no_usado_DDOE01ARA086NWDB_worldbank_1960_2014.csv",
+      "fuente": "FRED, serie DDOE01ARA086NWDB (\"Consumer Price Index for Argentina\"), Banco Mundial, base 2010=100",
+      "descripcion": "Índice de precios al consumidor de Argentina, 1960-2014.",
+      "usado_en_nucleo_1": false,
+      "uso": "descartado: el valor de 2014 (105.5) es menor al de 2013 (134.7), lo cual es económicamente inconsistente con la inflación real de Argentina en ese período -- indica un empalme roto entre fuentes en el propio dataset del Banco Mundial, no un error de descarga. Ver docs/methodology.md."
+    },
+    {
+      "archivo": "no_usado_DDOE02ARA086NWDB_worldbank_1960_2015.csv",
+      "fuente": "FRED, serie DDOE02ARA086NWDB (\"Consumer Price Index for Argentina\"), Banco Mundial, base 2010=100",
+      "descripcion": "Misma serie que DDOE01, vintage con un año más (hasta 2015).",
+      "usado_en_nucleo_1": false,
+      "uso": "descartado por el mismo motivo que DDOE01: el mismo quiebre inconsistente persiste (2013: 134.7, 2014: 105.5, 2015: 120.6 -- todavía por debajo de 2013)."
+    }
+  ]
+}

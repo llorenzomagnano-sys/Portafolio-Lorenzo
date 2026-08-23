@@ -1,0 +1,19 @@
+{
+  "source_page": "https://www.argentina.gob.ar/economia/sechacienda/asuntosprovinciales/ron",
+  "organismo": "Secretaría de Hacienda, Ministerio de Economía de la Nación",
+  "obtenido_por": "usuario (descarga manual desde su navegador, no por scripts/download_coparticipacion.py)",
+  "motivo": "el entorno de desarrollo no tiene acceso de salida (egress) a argentina.gob.ar",
+  "fecha_incorporacion_al_repo": "2026-08-20",
+  "archivos": [
+    {
+      "archivo": "serie_ron_2003_2025.csv",
+      "descripcion": "Recursos de Origen Nacional (RON) distribuidos por provincia, 2003-2025, desagregado por impuesto/régimen. Formato: ano;provincia;impuesto;regimen;monto (monto con coma decimal).",
+      "usado_en_nucleo_1": true
+    },
+    {
+      "archivo": "serie_ron_2003_2025.xlsx",
+      "descripcion": "Mismo contenido que el CSV, en formato Excel. Se conserva como respaldo, no se usa en el procesamiento (se usa el CSV).",
+      "usado_en_nucleo_1": false
+    }
+  ]
+}
