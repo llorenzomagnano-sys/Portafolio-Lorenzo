@@ -10,10 +10,20 @@ Este repositorio existe como pieza de portfolio técnico para postular a consult
 
 | Núcleo | Descripción | Estado |
 |---|---|---|
-| 1 | Serie histórica de coparticipación | pendiente |
+| 1 | Serie histórica de coparticipación | completo |
 | 2 | Aporte vs. recibo por provincia | pendiente |
 | 3 | Simulador de sensibilidad | pendiente |
 | 4 | Peso de la coparticipación en las cuentas de Córdoba | pendiente |
+
+### Núcleo 1 — Serie histórica de coparticipación (2016-2025)
+
+Muestra la evolución de la coparticipación federal recibida por Córdoba en pesos
+constantes, y la compara contra Buenos Aires, Santa Fe y Mendoza. El análisis está
+acotado a 2016-2025 por disponibilidad de datos de inflación confiables (ver
+[`docs/methodology.md`](docs/methodology.md) para el detalle). Notebook:
+[`notebooks/01_serie_historica.ipynb`](notebooks/01_serie_historica.ipynb).
+
+![Coparticipación real recibida por Córdoba, 2016-2025](output/figures/cordoba_evolucion_real_2016_2025.png)
 
 ## Estructura del repositorio
 
@@ -28,12 +38,13 @@ output/figures/    # Gráficos exportados.
 
 ## Fuentes de datos
 
-(en construcción)
+- **Secretaría de Hacienda / Ministerio de Economía de la Nación** — coparticipación /
+  Recursos de Origen Nacional por provincia (usada en el Núcleo 1).
+- **INDEC** — Índice de Precios al Consumidor, usado como deflactor (Núcleo 1).
+- datos.gob.ar (en construcción)
+- DGEyC Córdoba (Dirección General de Estadística y Censos de la Provincia de Córdoba) — (en construcción)
 
-- Secretaría de Hacienda / Ministerio de Economía de la Nación
-- datos.gob.ar
-- INDEC
-- DGEyC Córdoba (Dirección General de Estadística y Censos de la Provincia de Córdoba)
+Detalle completo de trazabilidad de cada fuente en [`data/raw/README.md`](data/raw/README.md).
 
 ## Cómo correr el proyecto
 
