@@ -12,7 +12,7 @@ Este repositorio existe como pieza de portfolio técnico para postular a consult
 |---|---|---|
 | 1 | Serie histórica de coparticipación | completo |
 | 2 | Aporte vs. recibo por provincia | completo |
-| 3 | Simulador de sensibilidad | pendiente |
+| 3 | Simulador de sensibilidad | completo |
 | 4 | Peso de la coparticipación en las cuentas de Córdoba | pendiente |
 
 ### Núcleo 1 — Serie histórica de coparticipación (2016-2025)
@@ -36,6 +36,22 @@ explícitamente la limitación del PBG como proxy del aporte tributario real (ve
 [`notebooks/02_aporte_vs_recibo.ipynb`](notebooks/02_aporte_vs_recibo.ipynb).
 
 ![Coparticipación recibida vs. PBG aportado, por provincia](output/figures/aporte_vs_recibo_ranking.png)
+
+### Núcleo 3 — Simulador de sensibilidad
+
+Un simulador (`scripts/simulator.py`, con tests automáticos) que calcula cómo se
+reparte entre provincias un shock de recaudación tributaria nacional coparticipable.
+Se validó contra la caída de recaudación real del primer cuatrimestre de 2026
+reportada por IARAF ($5,1 billones de caída total, $1,4 billones menos de
+coparticipación): la variación real implícita (~-8,6%) y la tasa de "coparticipabilidad"
+implícita (~46,7%) resultan consistentes con lo esperable, aunque —documentado
+explícitamente— es un chequeo de consistencia interna y no una validación contra una
+fuente independiente de recaudación coparticipable de 2026. Para ese shock, Córdoba
+pierde del orden de $120 mil millones de pesos. Incluye un simulador interactivo
+(slider de `ipywidgets`) para explorar otros escenarios. Notebook:
+[`notebooks/03_simulador_sensibilidad.ipynb`](notebooks/03_simulador_sensibilidad.ipynb).
+
+![Impacto de la caída de recaudación del primer cuatrimestre de 2026, por provincia](output/figures/simulador_validacion_1cuatrimestre2026.png)
 
 ## Estructura del repositorio
 
@@ -76,6 +92,9 @@ pip install -r requirements.txt
 
 # Levantar Jupyter para explorar los notebooks
 jupyter notebook
+
+# Correr los tests del simulador (Núcleo 3)
+pytest scripts/test_simulator.py
 ```
 
 ## Licencia
