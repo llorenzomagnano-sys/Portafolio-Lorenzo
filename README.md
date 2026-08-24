@@ -11,7 +11,7 @@ Este repositorio existe como pieza de portfolio técnico para postular a consult
 | Núcleo | Descripción | Estado |
 |---|---|---|
 | 1 | Serie histórica de coparticipación | completo |
-| 2 | Aporte vs. recibo por provincia | pendiente |
+| 2 | Aporte vs. recibo por provincia | completo |
 | 3 | Simulador de sensibilidad | pendiente |
 | 4 | Peso de la coparticipación en las cuentas de Córdoba | pendiente |
 
@@ -24,6 +24,18 @@ acotado a 2016-2025 por disponibilidad de datos de inflación confiables (ver
 [`notebooks/01_serie_historica.ipynb`](notebooks/01_serie_historica.ipynb).
 
 ![Coparticipación real recibida por Córdoba, 2016-2025](output/figures/cordoba_evolucion_real_2016_2025.png)
+
+### Núcleo 2 — Aporte vs. recibo por provincia
+
+Compara el peso económico de cada provincia (PBG, 2024) contra lo que recibe por
+coparticipación (coeficiente Ley 23.548). Córdoba aporta 8,6% del PBG nacional pero
+recibe solo 5,0% de la coparticipación — una brecha de -3,5 puntos porcentuales, la
+tercera peor del país después de Buenos Aires y CABA. El análisis documenta
+explícitamente la limitación del PBG como proxy del aporte tributario real (ver
+[`docs/methodology.md`](docs/methodology.md)). Notebook:
+[`notebooks/02_aporte_vs_recibo.ipynb`](notebooks/02_aporte_vs_recibo.ipynb).
+
+![Coparticipación recibida vs. PBG aportado, por provincia](output/figures/aporte_vs_recibo_ranking.png)
 
 ## Estructura del repositorio
 
@@ -41,6 +53,8 @@ output/figures/    # Gráficos exportados.
 - **Secretaría de Hacienda / Ministerio de Economía de la Nación** — coparticipación /
   Recursos de Origen Nacional por provincia (usada en el Núcleo 1).
 - **INDEC** — Índice de Precios al Consumidor, usado como deflactor (Núcleo 1).
+- **CEPAL** (metodología base INDEC) — Producto Bruto Geográfico por provincia (Núcleo 2).
+- Documento tipo Secretaría de Hacienda / BNA — coeficientes de coparticipación Ley 23.548 (Núcleo 2).
 - datos.gob.ar (en construcción)
 - DGEyC Córdoba (Dirección General de Estadística y Censos de la Provincia de Córdoba) — (en construcción)
 
