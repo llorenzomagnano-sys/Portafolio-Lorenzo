@@ -212,3 +212,50 @@ como Córdoba**. Esta limitación se documenta también, de forma visible, en
   económica), documentado en detalle arriba y en el notebook.
 - Script: `scripts/build_coefficients_comparison.py`.
 - Notebook: `notebooks/02_aporte_vs_recibo.ipynb`.
+
+### Núcleo 3 — Simulador de sensibilidad
+
+- Función núcleo: `simular_shock(variacion_pct_recaudacion, recaudacion_base,
+  coeficientes_por_provincia)` en `scripts/simulator.py`, con 9 tests automáticos en
+  `scripts/test_simulator.py` (`pytest scripts/test_simulator.py`).
+- **`recaudacion_base`** = masa coparticipable TOTAL de referencia (incluye Nación y
+  Fondo ATN, no solo lo que reciben las provincias). No es la recaudación tributaria
+  nacional total (que incluye impuestos no coparticipables).
+- **Consenso Fiscal excluido**: el simulador usa únicamente los coeficientes de Ley
+  23.548 (los mismos del Núcleo 2). La compensación del Consenso Fiscal (Ley 27.429) no
+  se incluye porque es un monto que se fija en pesos, no una proporción de la
+  recaudación corriente — no tiene sentido que responda a un shock porcentual. Esto
+  genera una diferencia intencional con la definición de "coparticipación" del Núcleo 1
+  (que sí suma Consenso Fiscal).
+- **Adelantos de coparticipación** (p. ej., Decreto 219/2026): se documentan como una
+  partida aparte (anticipos a cuenta de coparticipación futura). No cambian el
+  coeficiente de reparto de ninguna provincia, así que el simulador no los modela.
+- **Caso de validación**: la caída de recaudación del primer cuatrimestre de 2026
+  reportada por IARAF ($5,1 billones de caída total, $1,4 billones menos de
+  coparticipación). No se consiguió una cifra oficial de masa coparticipable de
+  referencia para ese período (misma restricción de acceso a internet del entorno de
+  desarrollo), así que la validación se construyó así:
+  1. Se estimó una `recaudacion_base` para un cuatrimestre a partir de datos reales
+     propios: la coparticipación nominal 2025 del Núcleo 1 (÷3 para aproximar 4 meses),
+     "grosseada" dividiendo por la suma de los 24 coeficientes de provincias (0,5876)
+     para llegar a la masa coparticipable total (no solo la parte que reciben las
+     provincias).
+  2. Se calculó qué variación % de recaudación, aplicada a esa base, reproduce
+     exactamente el impacto de $1,4 billones que reportó IARAF: **-8,6%**.
+  3. Como chequeo de consistencia independiente (no forzado por la calibración
+     anterior), se calculó qué fracción de la caída *total* de recaudación ($5,1
+     billones) representa la masa coparticipable afectada: **~46,7%**. Este número cae
+     dentro del rango que suele citarse para la proporción de la recaudación nacional
+     total que es coparticipable en Argentina (aproximadamente 40-50%), lo cual es una
+     señal razonable de que la `recaudacion_base` estimada y la cifra de IARAF son
+     mutuamente consistentes.
+  4. **Esto es una calibración/chequeo de consistencia, no una predicción validada
+     contra una tercera fuente independiente** de recaudación coparticipable real del
+     primer cuatrimestre de 2026 — esa fuente no se consiguió. Se documenta esta
+     limitación explícitamente en vez de presentar el resultado como una validación más
+     fuerte de lo que en realidad es.
+- **Interfaz interactiva**: se eligió un slider con `ipywidgets` dentro del notebook
+  (en vez de una app Streamlit aparte), para mantener consistencia con el resto del
+  proyecto (todo basado en notebooks) y porque no requiere levantar un proceso servidor
+  aparte para que el análisis sea reproducible.
+- Notebook: `notebooks/03_simulador_sensibilidad.ipynb`.
