@@ -1,0 +1,16 @@
+{
+  "organismo": "Documento tipo Secretaría de Hacienda / Banco de la Nación Argentina (BNA) -- \"Índices de Distribución de la Coparticipación Federal de Impuestos y Regímenes Especiales de Distribución\"",
+  "obtenido_por": "usuario (búsqueda y descarga manual, no por script)",
+  "fecha_incorporacion_al_repo": "2026-08-24",
+  "archivos": [
+    {
+      "archivo": "indices_copa_2018.pdf",
+      "descripcion": "Tabla de índices de distribución de la coparticipación federal por provincia, columna 'Coparticipación Federal (Ley 23548)' en la página 2.",
+      "fecha_del_documento": "2018-02-02 (confirmado por metadata del PDF: CreationDate/ModDate, Producer Microsoft Excel 2013, Author Jorge Adrián Gelemur)",
+      "usado_en_nucleo_2": true,
+      "uso": "coeficiente de coparticipación por provincia (proxy de '% que recibe' cada jurisdicción de la masa coparticipable total)",
+      "ajuste_manual_aplicado": "El valor de CABA en el documento original es 0,0375 (3,75%, vigente por Decreto 194/2016 en la fecha del documento). Se reemplazó manualmente por 0,014 (1,4%), el valor vigente desde 2020 según búsqueda web (no verificado por acceso directo a fuente primaria desde este entorno). El resto de los 23 coeficientes provinciales no se modificó: corresponden a la Ley 23.548 (1988), que no cambió desde entonces.",
+      "nota_metodologica": "Los 24 coeficientes (23 provincias + CABA ajustada) no se renormalizan para sumar 1 -- se usan tal cual, como fracción de la masa coparticipable TOTAL (que incluye la porción que retiene la Nación y el Fondo ATN). Ver docs/methodology.md."
+    }
+  ]
+}
