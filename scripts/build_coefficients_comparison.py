@@ -20,47 +20,19 @@ IMPORTANTE (ver docs/methodology.md para el detalle completo):
   tienen sede fiscal (muchas veces CABA), no necesariamente donde generan la actividad
   económica. Ver la sección de limitaciones en el notebook y en methodology.md.
 """
-import json
+import sys
 from pathlib import Path
 
 import pandas as pd
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(BASE_DIR / "scripts"))
+from coeficientes_ley23548 import COEFICIENTES_COPARTICIPACION  # noqa: E402
+
 PBG_PATH = BASE_DIR / "data" / "raw" / "pbg" / "Jurisdiccion_52sectores.xlsx"
 OUTPUT_PATH = BASE_DIR / "data" / "processed" / "aporte_vs_recibo.csv"
 
 PBG_YEAR = 2024
-
-# Coeficientes de coparticipación (Ley 23.548), extraídos manualmente de
-# data/raw/coeficientes/indices_copa_2018.pdf, página 2, columna
-# "Coparticipación Federal (Ley 23548)". CABA ajustada de 0,0375 (valor del documento,
-# año 2018) a 0,014 (vigente desde 2020) -- ver data/raw/coeficientes/_metadata.json.
-COEFICIENTES_COPARTICIPACION = {
-    "Buenos Aires": 0.12463838,
-    "CABA": 0.014,  # ajustado manualmente (original del PDF: 0.03750000)
-    "Catamarca": 0.01563276,
-    "Córdoba": 0.05039652,
-    "Corrientes": 0.02109876,
-    "Chaco": 0.02831388,
-    "Chubut": 0.00897608,
-    "Entre Ríos": 0.02771262,
-    "Formosa": 0.02066148,
-    "Jujuy": 0.01612470,
-    "La Pampa": 0.01065870,
-    "La Rioja": 0.01175190,
-    "Mendoza": 0.02366778,
-    "Misiones": 0.01874838,
-    "Neuquén": 0.00985064,
-    "Río Negro": 0.01432092,
-    "Salta": 0.02175468,
-    "San Juan": 0.01918566,
-    "San Luis": 0.01295442,
-    "Santa Cruz": 0.00897608,
-    "Santa Fe": 0.05072448,
-    "Santiago del Estero": 0.02344914,
-    "Tucumán": 0.02700204,
-    "Tierra del Fuego": 0.00700000,
-}
 
 # Nombres tal como aparecen en la hoja VABpb -> nombre canónico usado en el proyecto.
 PROVINCIA_CANONICA = {
