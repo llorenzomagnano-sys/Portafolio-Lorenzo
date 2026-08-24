@@ -13,14 +13,27 @@ dónde, con qué alcance temporal, y por qué se usó o se descartó cada uno).
 - **Índice de Precios al Consumidor (IPC)**: INDEC.
   <https://www.indec.gob.ar/ftp/cuadros/economia/serie_ipc_divisiones.csv>
   Archivo usado: `data/raw/ipc/serie_ipc_divisiones.csv` (mensual, desde dic-2016).
+- **Producto Bruto Geográfico (PBG) por provincia**: CEPAL, sobre metodología base de
+  INDEC (año base 2004). Archivo usado:
+  `data/raw/pbg/Jurisdiccion_52sectores.xlsx` (hoja `VABpb`), 2004-2024. No es la
+  publicación directa de INDEC (que solo llega a 2017 en su archivo público) — es una
+  actualización de CEPAL, usada por ser la fuente más reciente disponible.
+- **Coeficientes de coparticipación (Ley 23.548)**: documento tipo Secretaría de
+  Hacienda / BNA, "Índices de Distribución de la Coparticipación Federal de Impuestos y
+  Regímenes Especiales de Distribución". Archivo usado:
+  `data/raw/coeficientes/indices_copa_2018.pdf`, creado el 2 de febrero de 2018 (según
+  metadata del archivo) — ver limitaciones abajo sobre el ajuste aplicado.
 
-Ambos archivos fueron descargados manualmente por el usuario y subidos al repositorio,
-porque el entorno donde se desarrolló este núcleo no tiene acceso de salida a internet
-hacia sitios externos (incluidos `argentina.gob.ar` e `indec.gob.ar`). Los scripts
-`scripts/download_coparticipacion.py` y `scripts/download_ipc.py` existen para
-automatizar esto en un entorno con acceso a internet, pero no se probaron end-to-end.
+Todos los archivos fueron descargados manualmente por el usuario y subidos al
+repositorio, porque el entorno donde se desarrolló este proyecto no tiene acceso de
+salida a internet hacia sitios externos (incluidos `argentina.gob.ar`, `indec.gob.ar`,
+y en general casi cualquier dominio externo, confirmado también para Wikipedia,
+justia.com, fred.stlouisfed.org). Los scripts `scripts/download_coparticipacion.py` y
+`scripts/download_ipc.py` existen para automatizar la descarga de esas dos fuentes en
+un entorno con acceso a internet, pero no se probaron end-to-end.
 
-**Fecha de acceso / incorporación al repositorio**: 20 de agosto de 2026.
+**Fecha de acceso / incorporación al repositorio**: 20 de agosto de 2026 (Núcleo 1),
+24 de agosto de 2026 (Núcleo 2).
 
 ## Supuestos y limitaciones
 
@@ -97,6 +110,67 @@ disponible para cada año antes de deflactar. Al momento de escribir esto, **no 
 ninguna combinación** — si en el futuro se detectara alguna, el script corta la
 ejecución con un aviso explícito en vez de completarla silenciosamente.
 
+### Núcleo 2 — vintage de los coeficientes de coparticipación y ajuste de CABA
+
+El documento fuente de los coeficientes (`indices_copa_2018.pdf`) es de febrero de
+2018, no la versión más actual. Se detectó porque el valor de CABA ahí (3,75%)
+corresponde al Decreto 194/2016, mientras que el valor vigente desde 2020 es 1,4%.
+
+**Decisión tomada**: se corrigió manualmente solo el coeficiente de CABA a 1,4%. El
+resto de los 23 coeficientes provinciales **no se modificaron**, porque corresponden a
+la tabla de la Ley 23.548 (1988), que no cambió desde entonces — la única excepción
+material conocida en ese período es justamente la de CABA. El valor de 1,4% se tomó de
+una búsqueda web (no se pudo verificar por acceso directo a una fuente primaria desde
+este entorno).
+
+**No se modelaron dos ajustes adicionales**, documentados acá para que quede explícito
+que fueron evaluados y no aplicados en el Núcleo 2 (si vuelven a ser relevantes,
+conviene revisarlos en el Núcleo 3, el simulador):
+- La excepción de Córdoba, Santa Fe y San Luis a la detracción del 15% de la masa
+  coparticipable para financiar ANSES (por el fallo de la Corte Suprema de 2015). No es
+  un coeficiente distinto en la tabla de distribución — es un descuento aplicado sobre
+  la masa coparticipable *antes* de repartir según los coeficientes, así que no afecta
+  el número que se usa en este núcleo (el % que cada provincia recibe de la masa ya
+  neta de esa detracción es aproximadamente el mismo coeficiente, salvo por ese
+  descuento adicional que no sufren esas 3 provincias).
+- La adición de Tierra del Fuego (1991): ya está incluida en la tabla fuente con su
+  propio coeficiente (0,7%), no requirió ajuste.
+
+### Núcleo 2 — por qué no se renormalizan los coeficientes de coparticipación
+
+Los 24 coeficientes de coparticipación (23 provincias + CABA ajustada) suman
+aproximadamente 0,6086, no 1. Esto es correcto y esperado: el resto (~37,89% Nación +
+1% Fondo ATN, aproximadamente) es la porción de la masa coparticipable que no se
+distribuye a ninguna provincia. **Se decidió no renormalizar estos 24 valores para que
+sumen 1 entre sí.** Motivo: el coeficiente de Ley 23.548 ya representa, tal cual se
+publica, el % de la masa coparticipable *total* que recibe cada provincia — que es
+conceptualmente equivalente a "% del PBG total del país" que aporta cada provincia
+(ambas son fracciones de un total nacional, no fracciones de un subconjunto). Si se
+renormalizara, la comparación dejaría de responder la pregunta "qué proporción de la
+recaudación coparticipable/PBG nacional le corresponde a esta provincia" y pasaría a
+responder una pregunta distinta ("qué proporción de lo que efectivamente se reparte
+entre provincias"), que no fue lo pedido.
+
+**Importante**: esto significa que "% PBG" y "% coparticipación" no son estrictamente
+la "misma torta" — son dos fracciones de dos totales nacionales distintos (PBG país vs.
+masa coparticipable total). La diferencia entre ambas columnas es un indicador
+comparativo de orden de magnitud, útil para el ranking de provincias "ganadoras" y
+"perdedoras", pero no debe leerse como "esta provincia se está quedando con X puntos
+porcentuales de un pozo común".
+
+### Núcleo 2 — PBG como proxy del aporte tributario: limitación de atribución geográfica
+
+El PBG mide dónde se **genera** la actividad económica, no dónde se **paga** el
+impuesto. Las grandes empresas con operaciones en todo el país suelen tener domicilio
+fiscal en CABA, así que buena parte de la recaudación de impuestos nacionales
+coparticipables generada en otras provincias queda contabilizada, a efectos de
+recaudación, como si se hubiera generado en CABA. Esto probablemente **infla el aporte
+tributario "real" atribuible a CABA** más allá de lo que su propio PBG ya sugiere (que
+de por sí es alto, por concentrar sedes corporativas y servicios), y por el mismo
+motivo podría estar **subestimando el aporte tributario real de provincias productivas
+como Córdoba**. Esta limitación se documenta también, de forma visible, en
+`notebooks/02_aporte_vs_recibo.ipynb`.
+
 ## Metodología de deflactación
 
 - **Base de la serie real**: promedio del año 2016 = 100. Nota: el archivo de IPC
@@ -122,3 +196,19 @@ ejecución con un aviso explícito en vez de completarla silenciosamente.
   limitaciones" arriba).
 - Script de procesamiento: `scripts/process_coparticipacion.py`.
 - Notebook: `notebooks/01_serie_historica.ipynb`.
+
+### Núcleo 2 — Aporte vs. recibo por provincia
+
+- Unidad de análisis: provincia (24 jurisdicciones, un solo corte, no serie temporal).
+- "Aporta": % del PBG de cada provincia sobre el PBG total del país, año 2024 (el más
+  reciente disponible, dato preliminar en la fuente).
+- "Recibe": coeficiente de coparticipación Ley 23.548 por provincia, con el ajuste de
+  CABA a 1,4% (ver "Supuestos y limitaciones" arriba). No renormalizado.
+- Métrica: diferencia en puntos porcentuales (recibe − aporta). Positivo = la provincia
+  recibe proporcionalmente más de lo que su peso económico (PBG) sugeriría; negativo =
+  lo contrario.
+- Limitación central: el PBG es un proxy del aporte tributario real, con un problema de
+  atribución geográfica conocido (sede fiscal vs. lugar de generación de la actividad
+  económica), documentado en detalle arriba y en el notebook.
+- Script: `scripts/build_coefficients_comparison.py`.
+- Notebook: `notebooks/02_aporte_vs_recibo.ipynb`.
