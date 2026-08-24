@@ -70,5 +70,5 @@ Este proyecto está bajo licencia MIT. Ver [LICENSE](LICENSE) para más detalles
 
 ## Autor
 
-**[Nombre completo]**
-[LinkedIn / contacto]
+**[Lorenzo Magnano]**
+[LinkedIn: Lorenzo Magnano]
