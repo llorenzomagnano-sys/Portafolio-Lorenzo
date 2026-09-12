@@ -15,15 +15,19 @@ Este repositorio existe como pieza de portfolio técnico para postular a consult
 | 3 | Simulador de sensibilidad | completo |
 | 4 | Peso de la coparticipación en las cuentas de Córdoba | pendiente |
 
-### Núcleo 1 — Serie histórica de coparticipación (2016-2025)
+### Núcleo 1 — Serie histórica de coparticipación (2003-2025)
 
 Muestra la evolución de la coparticipación federal recibida por Córdoba en pesos
-constantes, y la compara contra Buenos Aires, Santa Fe y Mendoza. El análisis está
-acotado a 2016-2025 por disponibilidad de datos de inflación confiables (ver
-[`docs/methodology.md`](docs/methodology.md) para el detalle). Notebook:
+constantes, y la compara contra Buenos Aires, Santa Fe y Mendoza. El rango original
+(2016-2025) se amplió a 2003-2025 al incorporar una fuente de IPC confiable para
+2007-2015 (Fundación Norte y Sur / Orlando Ferreres), que reemplaza al IPC oficial de
+ese tramo — ampliamente desacreditado por la intervención del INDEC. No llega a 1990
+porque no existe una fuente de montos nominales de coparticipación anterior a 2003 (ver
+[`docs/methodology.md`](docs/methodology.md) para el detalle completo del empalme y de
+esta limitación). Notebook:
 [`notebooks/01_serie_historica.ipynb`](notebooks/01_serie_historica.ipynb).
 
-![Coparticipación real recibida por Córdoba, 2016-2025](output/figures/cordoba_evolucion_real_2016_2025.png)
+![Coparticipación real recibida por Córdoba, 2003-2025](output/figures/cordoba_evolucion_real_2003_2025.png)
 
 ### Núcleo 2 — Aporte vs. recibo por provincia
 
@@ -68,7 +72,10 @@ output/figures/    # Gráficos exportados.
 
 - **Secretaría de Hacienda / Ministerio de Economía de la Nación** — coparticipación /
   Recursos de Origen Nacional por provincia (usada en el Núcleo 1).
-- **INDEC** — Índice de Precios al Consumidor, usado como deflactor (Núcleo 1).
+- **INDEC** — Índice de Precios al Consumidor, usado como deflactor 2016-2025 (Núcleo 1).
+- **Fundación Norte y Sur / Orlando Ferreres** — Índice de Precios al Consumidor,
+  empalmado con el de INDEC para deflactar 2003-2015 (Núcleo 1), tramo en el que el IPC
+  oficial está desacreditado por la intervención del INDEC.
 - **CEPAL** (metodología base INDEC) — Producto Bruto Geográfico por provincia (Núcleo 2).
 - Documento tipo Secretaría de Hacienda / BNA — coeficientes de coparticipación Ley 23.548 (Núcleo 2).
 - datos.gob.ar (en construcción)
