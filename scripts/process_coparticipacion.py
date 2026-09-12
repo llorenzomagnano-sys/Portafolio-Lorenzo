@@ -1,13 +1,25 @@
 """
 Procesa y deflacta la serie de coparticipación federal por provincia (Núcleo 1).
 
-Alcance definido tras evaluar la disponibilidad real de datos (ver
-docs/methodology.md): **2016-2025 únicamente**. El archivo fuente de RON cubre
-2003-2025, pero el IPC nacional oficial confiable solo cubre desde diciembre de
-2016 -- no se encontró una fuente de inflación creíble para 2014-2015 (las
-series alternativas evaluadas mostraban un empalme roto en ese tramo, con el
-índice bajando de un año a otro pese a la inflación real). En vez de inventar
-un supuesto para tapar ese hueco, se acotó el alcance temporal.
+Alcance: **2003-2025**. El archivo fuente de RON (montos nominales por provincia)
+solo cubre desde 2003 -- no hay fuente de montos nominales de coparticipación
+para 1990-2002 (se buscó explícitamente y el usuario confirmó no tenerla), así
+que la serie en pesos no puede arrancar antes de 2003 aunque el índice de
+precios sí podría reconstruirse más atrás.
+
+El IPC nacional oficial confiable (serie_ipc_divisiones.csv) solo cubre desde
+diciembre de 2016. Para 2007-2015 el IPC oficial de la época está ampliamente
+desacreditado (intervención del INDEC, ver docs/methodology.md). Para llegar a
+2003 con un deflactor confiable se empalma un IPC de tres tramos, usando la
+base de Fundación Norte y Sur / Orlando Ferreres para 2003-2015:
+  - 2003-2006: tabla "GBA (INDEC)" del archivo Ferreres (tramo pre-intervención,
+    confiable).
+  - 2007-2015: tabla "GBA (estimaciones privadas)" del mismo archivo (sustituye
+    al IPC oficial desacreditado de ese tramo).
+  - 2016-2025: IPC oficial nacional ya usado (serie_ipc_divisiones.csv), sin
+    modificar.
+El empalme se ancla exactamente al valor ya publicado de 2016 (ver
+load_ipc_empalmado() y docs/methodology.md para el detalle y las tasas usadas).
 
 Definición de "coparticipación" usada acá (decisión documentada, no es la única
 posible): suma de los conceptos que Hacienda reporta bajo
@@ -20,6 +32,7 @@ más
 Entradas:
   - data/raw/coparticipacion/serie_ron_2003_2025.csv
   - data/raw/ipc/serie_ipc_divisiones.csv
+  - data/raw/ipc/fundacion_norte_y_sur_orlando_ferreres.xlsx
 
 Salida:
   - data/processed/coparticipacion_real.csv
@@ -32,11 +45,29 @@ import pandas as pd
 BASE_DIR = Path(__file__).resolve().parent.parent
 RON_PATH = BASE_DIR / "data" / "raw" / "coparticipacion" / "serie_ron_2003_2025.csv"
 IPC_PATH = BASE_DIR / "data" / "raw" / "ipc" / "serie_ipc_divisiones.csv"
+IPC_FERRERES_PATH = BASE_DIR / "data" / "raw" / "ipc" / "fundacion_norte_y_sur_orlando_ferreres.xlsx"
 OUTPUT_PATH = BASE_DIR / "data" / "processed" / "coparticipacion_real.csv"
 
-SCOPE_START_YEAR = 2016
+SCOPE_START_YEAR = 2003
 SCOPE_END_YEAR = 2025
 BASE_YEAR = 2016  # serie real en pesos constantes, base = promedio del año 2016
+
+# Hoja del archivo Ferreres que contiene las tasas de variación anual (var. %
+# anual) usadas para el empalme. Se leen directamente tal como están en la
+# fuente (no se recalculan a partir de los niveles, para no introducir
+# redondeos distintos a los de la fuente).
+IPC_FERRERES_SHEET = "IPC "
+
+# Años cuya variación % anual se toma de cada tabla del archivo Ferreres:
+#   - tabla A ("GBA (INDEC)"): tramo 2004-2006, pre-intervención, confiable.
+#     Se usa para encadenar hacia atrás desde 2006 hasta 2003.
+#   - tabla B ("GBA (estimaciones privadas)"): tramo 2007-2016. Se usa para
+#     encadenar hacia atrás desde el valor de 2016 ya publicado hasta 2006,
+#     porque para 2007-2015 el IPC oficial de la época está desacreditado
+#     (ver docs/methodology.md). El año 2016 se incluye solo para anclar el
+#     empalme al dato ya existente, no se usa como valor final de 2016.
+IPC_FERRERES_ANIOS_TABLA_A = [2004, 2005, 2006]
+IPC_FERRERES_ANIOS_TABLA_B = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016]
 
 CONCEPTOS_COPARTICIPACION = {
     "coparticipacion federal de impuestos ley 23548",
@@ -154,9 +185,92 @@ def load_ipc_promedio_anual() -> pd.DataFrame:
     return promedio
 
 
+def _parse_anio_ferreres(valor) -> int | None:
+    """Convierte 'Año' de la hoja Ferreres a int, tolerando el asterisco usado
+    en algunas filas (p. ej. '2015*') para marcar años ajustados por la fuente."""
+    if valor is None:
+        return None
+    texto = str(valor).strip().rstrip("*")
+    try:
+        return int(float(texto))
+    except ValueError:
+        return None
+
+
+def load_ipc_ferreres_var_pct() -> tuple[dict, dict]:
+    """Lee la hoja "IPC " del archivo Ferreres y devuelve (var_tabla_a,
+    var_tabla_b): año -> variación % anual, una por cada una de las dos tablas
+    anuales de esa hoja (columna A = Año, columna C = var. % anual del
+    promedio)."""
+    raw = pd.read_excel(IPC_FERRERES_PATH, sheet_name=IPC_FERRERES_SHEET, header=None)
+
+    filas_tabla_a = raw[raw[1].astype(str).str.contains("GBA \\(INDEC\\)", na=False)].index
+    filas_tabla_b = raw[raw[1].astype(str).str.contains("estimaciones privadas", na=False)].index
+    if len(filas_tabla_a) != 1 or len(filas_tabla_b) != 1:
+        raise SystemExit(
+            "No se encontraron (o se encontró más de una vez) los encabezados "
+            "'GBA (INDEC)' / 'estimaciones privadas' en la hoja "
+            f"'{IPC_FERRERES_SHEET}' de {IPC_FERRERES_PATH}. Revisar manualmente."
+        )
+    inicio_a, inicio_b = int(filas_tabla_a[0]), int(filas_tabla_b[0])
+
+    def parse_tabla(fila_inicio: int, fila_fin: int) -> dict:
+        var_por_anio = {}
+        for i in range(fila_inicio, fila_fin):
+            anio = _parse_anio_ferreres(raw.iat[i, 0])
+            var = raw.iat[i, 2]
+            if anio is not None and isinstance(var, (int, float)):
+                var_por_anio[anio] = float(var)
+        return var_por_anio
+
+    var_tabla_a = parse_tabla(inicio_a + 2, inicio_b)
+    var_tabla_b = parse_tabla(inicio_b + 2, len(raw))
+    return var_tabla_a, var_tabla_b
+
+
+def load_ipc_empalmado() -> pd.DataFrame:
+    """Construye ipc_promedio_anual para 2003-2025 empalmando tres fuentes
+    (ver docstring del módulo y docs/methodology.md):
+      - 2016-2025: IPC oficial nacional ya usado (sin modificar).
+      - 2007-2015: encadenado hacia atrás desde el valor de 2016 usando las
+        tasas de la tabla "estimaciones privadas" de Ferreres.
+      - 2003-2006: encadenado hacia atrás desde el valor resultante de 2006
+        usando las tasas de la tabla "GBA (INDEC)" de Ferreres.
+    El empalme queda anclado exactamente al valor de 2016 ya publicado; no se
+    recalculan ni modifican los años 2016-2025.
+    """
+    ipc_oficial = load_ipc_promedio_anual()
+    if 2016 not in set(ipc_oficial["anio"]):
+        raise SystemExit("No hay IPC oficial para 2016; no se puede anclar el empalme.")
+    nivel = {2016: float(ipc_oficial.loc[ipc_oficial["anio"] == 2016, "ipc_promedio_anual"].iloc[0])}
+
+    var_tabla_a, var_tabla_b = load_ipc_ferreres_var_pct()
+
+    faltantes_b = [a for a in IPC_FERRERES_ANIOS_TABLA_B if a not in var_tabla_b]
+    faltantes_a = [a for a in IPC_FERRERES_ANIOS_TABLA_A if a not in var_tabla_a]
+    if faltantes_b or faltantes_a:
+        raise SystemExit(
+            f"Faltan tasas de variación anual en el archivo Ferreres: tabla A {faltantes_a}, "
+            f"tabla B {faltantes_b}. No se completan con supuestos."
+        )
+
+    for anio in sorted(IPC_FERRERES_ANIOS_TABLA_B, reverse=True):
+        nivel[anio - 1] = nivel[anio] / (1 + var_tabla_b[anio])
+    for anio in sorted(IPC_FERRERES_ANIOS_TABLA_A, reverse=True):
+        nivel[anio - 1] = nivel[anio] / (1 + var_tabla_a[anio])
+
+    empalmado = pd.DataFrame(
+        {"anio": list(nivel.keys()), "ipc_promedio_anual": list(nivel.values())}
+    )
+    empalmado = empalmado[
+        (empalmado["anio"] >= SCOPE_START_YEAR) & (empalmado["anio"] < 2016)
+    ]
+    return pd.concat([empalmado, ipc_oficial], ignore_index=True).sort_values("anio")
+
+
 def main() -> None:
     nominal = load_ron_nominal()
-    ipc = load_ipc_promedio_anual()
+    ipc = load_ipc_empalmado()
 
     if BASE_YEAR not in set(ipc["anio"]):
         raise SystemExit(f"No hay IPC disponible para el año base {BASE_YEAR}.")
