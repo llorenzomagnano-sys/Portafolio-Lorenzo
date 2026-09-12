@@ -29,6 +29,10 @@ dónde, con qué alcance temporal, y por qué se usó o se descartó cada uno).
   Regímenes Especiales de Distribución". Archivo usado:
   `data/raw/coeficientes/indices_copa_2018.pdf`, creado el 2 de febrero de 2018 (según
   metadata del archivo) — ver limitaciones abajo sobre el ajuste aplicado.
+- **Ingresos corrientes de Córdoba (proxy), 2015-2025**: recaudación administrada por la
+  Dirección General de Rentas de Córdoba, provista directamente por el usuario. Archivo
+  usado: `data/raw/ingresos_cordoba/serie_recaudacion_provincial.xlsx` (Núcleo 4) — ver
+  limitación de alcance y corrección de unidades en la sección del Núcleo 4 más abajo.
 
 Todos los archivos fueron descargados manualmente por el usuario y subidos al
 repositorio, porque el entorno donde se desarrolló este proyecto no tiene acceso de
@@ -319,3 +323,51 @@ como Córdoba**. Esta limitación se documenta también, de forma visible, en
   proyecto (todo basado en notebooks) y porque no requiere levantar un proceso servidor
   aparte para que el análisis sea reproducible.
 - Notebook: `notebooks/03_simulador_sensibilidad.ipynb`.
+
+### Núcleo 4 — Peso de la coparticipación en las cuentas de Córdoba
+
+- **Fuente de ingresos**: `data/raw/ingresos_cordoba/serie_recaudacion_provincial.xlsx`
+  (hoja `Serie_Mensual`), un archivo que el usuario ya tenía construido. El nombre real
+  del archivo no coincide con el que se había anticipado (`dgeyc_ingresos_cordoba.xlsx`)
+  — se confirmó con el usuario que igualmente es la fuente que corresponde a este
+  núcleo antes de integrarlo.
+- **Definición de "ingresos corrientes totales" usada (decisión documentada, no la
+  única posible)**: la fila "Total" del archivo = Recursos de Origen Provincial +
+  Recursos de Origen Nacional, administrados por la Dirección General de Rentas de
+  Córdoba. La propia nota al pie del archivo aclara que **excluye** lo recaudado por
+  otros organismos públicos provinciales (p. ej., el Fondo para el Desarrollo
+  Energético Provincial recaudado por EPEC). Es decir, **no** es el ingreso corriente
+  total del sector público provincial en sentido estricto de ejecución presupuestaria
+  (cuenta ahorro-inversión-financiamiento), sino la mejor proxy disponible — se usa así
+  tras confirmarlo explícitamente con el usuario.
+- **Unidades del archivo fuente, corregidas**: el encabezado de las hojas dice
+  "Millones de pesos corrientes", pero es incorrecto — los valores de celda están en
+  PESOS corrientes. Se verificó cruzando la fila "Coparticipación Federal de Impuestos
+  (CFI)" del archivo: la suma de los 12 meses de 2015 da $23.709.952.851, contra
+  $23.673.039.600 (23.673,04 millones) del `monto_nominal` de Córdoba 2015 ya calculado
+  en el Núcleo 1 a partir de una fuente independiente (Secretaría de Hacienda) —
+  diferencia de apenas 0,16%. Esto confirma la unidad real (pesos) y de paso valida
+  cruzadamente el propio Núcleo 1 con una fuente distinta.
+- **Problema de formato detectado**: la columna de diciembre de 2023 en `Serie_Mensual`
+  está guardada como texto ("dic-23") en vez de fecha, a diferencia de todas las demás
+  columnas. `scripts/build_dependencia_fiscal.py` la parsea aparte en vez de asumir que
+  todas las columnas tienen el mismo formato.
+- **Numerador del ratio**: `monto_nominal` (no `monto_real_base2016`) de Córdoba, del
+  Núcleo 1. Para un ratio "% de los ingresos que es coparticipación" hace falta
+  comparar magnitudes del mismo tipo (nominal sobre nominal, del mismo año) — usar la
+  serie deflactada en el numerador contra un denominador nominal distorsionaría el
+  ratio con el efecto de la inflación, sin ningún motivo válido para hacerlo.
+- **Alcance**: 2015-2025 (11 años) — intersección entre lo que cubre el archivo de
+  ingresos (desde enero de 2015) y el Núcleo 1 (hasta 2025). 2026 queda afuera del
+  ratio anual por ser un año calendario incompleto en ambas fuentes.
+- **Indicador de sensibilidad**: reutiliza `scripts/simulator.py::simular_shock` del
+  Núcleo 3. La masa coparticipable base para 2025 se estima igual que en la validación
+  del Núcleo 3 (`recaudacion_base` = coparticipación nominal recibida por las 24
+  jurisdicciones en 2025, dividida por la suma de sus 24 coeficientes, para
+  "gross-upear" a la masa coparticipable total). El impacto en pesos resultante para
+  Córdoba se divide por sus ingresos corrientes totales de 2025 para obtener el
+  impacto en % del ingreso provincial total. Es una simplificación de primera ronda: no
+  modela respuestas de política provincial (ajuste de gasto, recaudación propia
+  adicional, endeudamiento) ante la caída de ingresos.
+- Script: `scripts/build_dependencia_fiscal.py`.
+- Notebook: `notebooks/04_dependencia_fiscal_cordoba.ipynb`.
