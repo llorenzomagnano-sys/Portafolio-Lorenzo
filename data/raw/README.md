@@ -56,6 +56,23 @@ end-to-end todavía, así que conviene revisar su salida la primera vez que se u
   porque no hay fuente de montos nominales de coparticipación anterior a 2003 (ver
   sección de RON arriba).
 
+### Ingresos corrientes de Córdoba (proxy, Núcleo 4)
+
+- **Organismo**: Dirección General de Rentas de la Provincia de Córdoba (archivo
+  provisto directamente por el usuario, ya construido con anterioridad).
+- **Archivo usado**: `ingresos_cordoba/serie_recaudacion_provincial.xlsx`, hoja
+  `Serie_Mensual` — recaudación mensual, enero 2015 a agosto 2026. Para el Núcleo 4 se
+  usan solo años calendario completos, 2015-2025.
+- **Nombre real distinto del anticipado**: el usuario había dicho que subiría
+  `dgeyc_ingresos_cordoba.xlsx`; el archivo real se llama
+  `Serie-recaudacion-provincial_Ene15-Ago26.xlsx` — se confirmó con el usuario que es
+  la fuente correcta antes de integrarla.
+- **Limitación de alcance**: la fila "Total" usada como proxy de "ingresos corrientes
+  totales" excluye lo recaudado por otros organismos públicos provinciales (p. ej.
+  EPEC), según la propia nota al pie del archivo. Ver `docs/methodology.md`, sección
+  del Núcleo 4, para el detalle completo (incluida la corrección de unidades: el
+  archivo dice "millones de pesos" pero son pesos).
+
 ## Otros archivos en esta carpeta (no usados en el Núcleo 1)
 
 Se conservan como referencia para núcleos futuros o para revisar la decisión de acotar

@@ -1,0 +1,18 @@
+{
+  "obtenido_por": "usuario (archivo propio, ya construido con anterioridad, subido directamente al chat)",
+  "fecha_incorporacion_al_repo": "2026-09-12",
+  "nombre_original_del_pedido": "el usuario dijo que subiría 'dgeyc_ingresos_cordoba.xlsx', pero el archivo real que llegó se llama 'Serie-recaudacion-provincial_Ene15-Ago26.xlsx' -- se usó igual, tras confirmar con el usuario que es la fuente que corresponde a este núcleo",
+  "archivos": [
+    {
+      "archivo": "serie_recaudacion_provincial.xlsx",
+      "fuente": "Recaudación administrada por la Dirección General de Rentas de la Provincia de Córdoba (probablemente republicada/consolidada por DGEyC Córdoba, no se pudo verificar una URL pública exacta desde este entorno)",
+      "descripcion": "Serie mensual (hoja 'Serie_Mensual') y acumulada (hoja 'Serie_Acum', no usada -- se recalculan los totales anuales a partir de Serie_Mensual) de recaudación por concepto, enero 2015 a agosto 2026. Fila 'Total' = 'Recursos de Origen Provincial' + 'Recursos de Origen Nacional' (incluye la fila 'Coparticipación Federal de Impuestos (CFI)').",
+      "cobertura": "enero 2015 - agosto 2026 (mensual); para el Núcleo 4 se usan años calendario completos, 2015-2025 (2026 queda incompleto)",
+      "unidades": "El encabezado de ambas hojas dice \"Millones de pesos corrientes\", pero es incorrecto: los valores de celda están en PESOS corrientes, no en millones. Verificado cruzando la fila CFI de 2015 (suma de los 12 meses = $23.709.952.851) contra el monto_nominal de coparticipación de Córdoba en 2015 ya calculado en el Núcleo 1 a partir de una fuente independiente (Secretaría de Hacienda): $23.673.039.600 (23.673,04 millones). Diferencia de apenas 0,16%, confirma que la unidad real es pesos.",
+      "limitacion_de_alcance": "La nota al pie (1) de la hoja 'Referencias' aclara: \"Se incluye en esta clasificación sólo los recursos provinciales en los que la Dirección General de Rentas es la encargada de su recaudación. Se excluyen aquellos recaudados por otras entidades públicas provinciales, por ejemplo, el Fondo para el Desarrollo Energético Provincial recaudado por EPEC.\" Es decir, la fila 'Total' NO es el ingreso corriente total del sector público provincial en sentido de ejecución presupuestaria -- excluye lo recaudado por EPEC y otros organismos descentralizados. Se usa igual como la mejor proxy disponible, confirmado explícitamente con el usuario antes de integrarla.",
+      "problema_de_formato_detectado": "La columna de fecha correspondiente a diciembre de 2023 está guardada como texto ('dic-23') en vez de una fecha real, a diferencia de todas las demás columnas. scripts/build_dependencia_fiscal.py la parsea aparte.",
+      "usado_en_nucleo_4": true,
+      "uso": "denominador (ingresos corrientes totales de Córdoba, proxy) del ratio de dependencia fiscal del Núcleo 4"
+    }
+  ]
+}
