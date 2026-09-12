@@ -13,7 +13,7 @@ Este repositorio existe como pieza de portfolio técnico para postular a consult
 | 1 | Serie histórica de coparticipación | completo |
 | 2 | Aporte vs. recibo por provincia | completo |
 | 3 | Simulador de sensibilidad | completo |
-| 4 | Peso de la coparticipación en las cuentas de Córdoba | pendiente |
+| 4 | Peso de la coparticipación en las cuentas de Córdoba | completo |
 
 ### Núcleo 1 — Serie histórica de coparticipación (2003-2025)
 
@@ -57,6 +57,25 @@ pierde del orden de $120 mil millones de pesos. Incluye un simulador interactivo
 
 ![Impacto de la caída de recaudación del primer cuatrimestre de 2026, por provincia](output/figures/simulador_validacion_1cuatrimestre2026.png)
 
+### Núcleo 4 — Peso de la coparticipación en las cuentas de Córdoba
+
+Calcula qué porcentaje de los ingresos corrientes totales de Córdoba proviene de la
+coparticipación federal (2015-2025), y usa el simulador del Núcleo 3 para traducir un
+shock de recaudación nacional en un impacto sobre el ingreso provincial total. La
+coparticipación pasó de representar el 36% de los ingresos corrientes de Córdoba en
+2015 a un pico de ~52% en 2022-2024, y bajó a 46,5% en 2025 — un nivel de dependencia
+moderado, coherente con que Córdoba tiene una base tributaria propia significativa
+(~42-44% de sus ingresos) pero sigue dependiendo de Nación para la mayor parte de su
+financiamiento. Con ese nivel de dependencia, una caída del 10% en la recaudación
+nacional coparticipable le cuesta a Córdoba aproximadamente 4,7% de sus ingresos
+corrientes totales. "Ingresos corrientes totales" es una proxy (recaudación
+administrada por la Dirección General de Rentas, excluye lo recaudado por otros
+organismos como EPEC) — ver [`docs/methodology.md`](docs/methodology.md) para el
+detalle completo. Notebook:
+[`notebooks/04_dependencia_fiscal_cordoba.ipynb`](notebooks/04_dependencia_fiscal_cordoba.ipynb).
+
+![Coparticipación como % de los ingresos corrientes de Córdoba, 2015-2025](output/figures/dependencia_fiscal_cordoba.png)
+
 ## Estructura del repositorio
 
 ```
@@ -78,8 +97,7 @@ output/figures/    # Gráficos exportados.
   oficial está desacreditado por la intervención del INDEC.
 - **CEPAL** (metodología base INDEC) — Producto Bruto Geográfico por provincia (Núcleo 2).
 - Documento tipo Secretaría de Hacienda / BNA — coeficientes de coparticipación Ley 23.548 (Núcleo 2).
-- datos.gob.ar (en construcción)
-- DGEyC Córdoba (Dirección General de Estadística y Censos de la Provincia de Córdoba) — (en construcción)
+- Dirección General de Rentas de Córdoba — recaudación e ingresos corrientes provinciales (Núcleo 4).
 
 Detalle completo de trazabilidad de cada fuente en [`data/raw/README.md`](data/raw/README.md).
 
