@@ -8,11 +8,17 @@ dónde, con qué alcance temporal, y por qué se usó o se descartó cada uno).
 - **Coparticipación federal / Recursos de Origen Nacional (RON)**: Secretaría de
   Hacienda, Ministerio de Economía de la Nación.
   <https://www.argentina.gob.ar/economia/sechacienda/asuntosprovinciales/ron>
-  Archivo usado: `data/raw/coparticipacion/serie_ron_2003_2025.csv` (2003-2025, aunque
-  el Núcleo 1 solo usa 2016-2025 — ver más abajo).
-- **Índice de Precios al Consumidor (IPC)**: INDEC.
+  Archivo usado: `data/raw/coparticipacion/serie_ron_2003_2025.csv` (2003-2025). El
+  Núcleo 1 usa el rango completo 2003-2025 — no llega a años anteriores porque no hay
+  fuente de montos nominales de coparticipación para 1990-2002 (se buscó explícitamente
+  y no se consiguió).
+- **Índice de Precios al Consumidor (IPC), 2016-2025**: INDEC.
   <https://www.indec.gob.ar/ftp/cuadros/economia/serie_ipc_divisiones.csv>
   Archivo usado: `data/raw/ipc/serie_ipc_divisiones.csv` (mensual, desde dic-2016).
+- **Índice de Precios al Consumidor, 2003-2015**: Fundación Norte y Sur / Orlando J.
+  Ferreres, provisto directamente por el usuario. Archivo usado:
+  `data/raw/ipc/fundacion_norte_y_sur_orlando_ferreres.xlsx`, hoja `IPC ` — ver el
+  detalle del empalme más abajo ("Empalme del IPC 2003-2015").
 - **Producto Bruto Geográfico (PBG) por provincia**: CEPAL, sobre metodología base de
   INDEC (año base 2004). Archivo usado:
   `data/raw/pbg/Jurisdiccion_52sectores.xlsx` (hoja `VABpb`), 2004-2024. No es la
@@ -33,36 +39,28 @@ justia.com, fred.stlouisfed.org). Los scripts `scripts/download_coparticipacion.
 un entorno con acceso a internet, pero no se probaron end-to-end.
 
 **Fecha de acceso / incorporación al repositorio**: 20 de agosto de 2026 (Núcleo 1),
-24 de agosto de 2026 (Núcleo 2).
+24 de agosto de 2026 (Núcleo 2), 12 de septiembre de 2026 (ampliación del Núcleo 1 a
+2003-2025).
 
 ## Supuestos y limitaciones
 
-### Alcance temporal acotado a 2016-2025
+### Alcance temporal: 2003-2025 (ampliado desde 2016-2025 original)
 
-El archivo de RON cubre 2003-2025, pero el Núcleo 1 **solo procesa 2016-2025**. Motivo:
-no se consiguió una serie de IPC nacional confiable para 2003-2015. En el camino se
-evaluaron y descartaron explícitamente:
+El Núcleo 1 se acotó originalmente a 2016-2025 porque no se contaba con una fuente
+confiable de IPC para años anteriores (ver más abajo, "Confiabilidad del IPC oficial en
+el período 2007-2015", y el detalle de fuentes descartadas en esa sección). Al
+incorporarse la base de Fundación Norte y Sur / Orlando Ferreres, se pudo extender el
+IPC de forma confiable hasta 2003, así que el alcance pasó a **2003-2025**.
 
-- **IPC INDEC "histórico" (`sh_ipc_12_16.xls`)**: pese al nombre, solo cubre abril-
-  noviembre 2016, no aporta cobertura hacia atrás.
-- **Series del Banco Mundial vía FRED (`DDOE01ARA086NWDB`, `DDOE02ARA086NWDB`)**: cubren
-  1960-2014 y 1960-2015 respectivamente, y el tramo 2003-2013 es internamente coherente
-  (se nota la hiperinflación de 1989-90, la Convertibilidad 1991-2001, la crisis de
-  2002). Pero **2014 y 2015 muestran el índice bajando respecto de 2013** (134,7 → 105,5
-  → 120,6), algo económicamente imposible dado que Argentina tuvo inflación alta y
-  positiva esos años. Esto indica un empalme mal hecho entre fuentes en el propio
-  dataset del Banco Mundial en ese punto de corte, no un error de descarga — coincide
-  con el período de mayor descrédito del IPC oficial de INDEC (ver nota abajo), que
-  aparentemente tampoco pudo resolverse limpiamente en compilaciones internacionales.
-- **Serie FRED `FPCPITOTLZGARG`** (inflación anual %, Banco Mundial): solo cubre
-  2018-2024, no aporta al hueco 2014-2015.
-
-Ante la falta de una fuente confiable para ese tramo específico, se decidió **no
-inventar un valor** (ni interpolar, ni usar el dato roto con una advertencia) y en
-cambio **acotar el alcance del núcleo a 2016-2025**, donde el IPC oficial de INDEC es
-sólido y de frecuencia mensual. La coparticipación nominal 2003-2015 queda disponible en
-los datos crudos por si se retoma este análisis en el futuro con una fuente de precios
-mejor para ese tramo.
+**No llega a 1990** (que era el pedido original de ampliación), pese a que el archivo de
+Ferreres sí permitiría reconstruir el índice de precios desde mucho antes (ver más abajo).
+El límite real es otro: **no existe, en ninguna fuente disponible para este proyecto,
+un dato de montos nominales de coparticipación por provincia para 1990-2002** — el
+archivo de RON (Secretaría de Hacienda) que se usa para los montos en pesos solo cubre
+desde 2003. Sin esos montos no hay nada que deflactar, así que ampliar el índice de
+precios más atrás no serviría de nada en este núcleo. Se confirmó explícitamente con el
+usuario que no dispone de esa fuente, y se decidió avanzar con el rango 2003-2025 en vez
+de dejar el núcleo bloqueado.
 
 ### Confiabilidad del IPC oficial en el período 2007-2015
 
@@ -71,9 +69,68 @@ de INDEC entre aproximadamente 2007 y 2015 subestimó la inflación real, en el 
 de lo que se conoce como la "intervención del INDEC". El FMI aplicó una censura formal a
 la Argentina en 2013 por la calidad de estos datos, y el propio INDEC —bajo otra
 gestión, desde fines de 2015— declaró la "emergencia estadística" y descontinuó esos
-índices. Esto refuerza la decisión de no usar ese tramo ni siquiera como aproximación:
-además de no encontrarse una fuente empalmada de forma confiable, la fuente oficial de
-ese período específico es de por sí cuestionable.
+índices.
+
+Al acotar el núcleo originalmente a 2016-2025, se habían evaluado y descartado además
+estas fuentes (ya no relevantes para el rango actual, mantenidas acá como registro):
+
+- **IPC INDEC "histórico" (`sh_ipc_12_16.xls`)**: pese al nombre, solo cubre abril-
+  noviembre 2016, no aporta cobertura hacia atrás.
+- **Series del Banco Mundial vía FRED (`DDOE01ARA086NWDB`, `DDOE02ARA086NWDB`)**: cubren
+  1960-2014 y 1960-2015 respectivamente. El tramo 2003-2013 es internamente coherente,
+  pero **2014 y 2015 muestran el índice bajando respecto de 2013** (134,7 → 105,5 →
+  120,6), algo económicamente imposible dado que Argentina tuvo inflación alta y
+  positiva esos años — indica un empalme mal hecho en el propio dataset del Banco
+  Mundial, no un error de descarga, y coincide con el mismo período de descrédito del
+  IPC oficial.
+- **Serie FRED `FPCPITOTLZGARG`** (inflación anual %, Banco Mundial): solo cubre
+  2018-2024, no aporta al hueco 2007-2015.
+
+### Empalme del IPC 2003-2015 (Fundación Norte y Sur / Orlando Ferreres)
+
+La base provista por el usuario (`data/raw/ipc/fundacion_norte_y_sur_orlando_ferreres.xlsx`,
+hoja `IPC `) contiene dos tablas anuales relevantes, ambas con base Diciembre 2016=100 o
+Diciembre 2015=100 según la tabla:
+
+- **Tabla A — "Índice de Precios al Consumidor GBA (INDEC)"**: serie continua desde
+  ~1810 hasta 2025. Para 2007-2014 reproduce las mismas tasas de inflación **bajas y
+  desacreditadas** que el IPC oficial de la época (8%-10% anual) — es decir, **no está
+  corregida** para el período de intervención. Se usa acá solo para el tramo
+  **2004-2006** (pre-intervención, sin motivo para desconfiar).
+- **Tabla B — "Índice de Precios al Consumidor GBA (estimaciones privadas)"**: cubre
+  2006-2025. Para 2007-2015 reporta tasas mucho más altas (14%-40% anual), consistentes
+  con las estimaciones privadas/de consultoras contemporáneas al período de intervención
+  del INDEC. Se usa acá para el tramo **2007-2016** (2016 solo para anclar el empalme al
+  valor de 2016 ya publicado en este proyecto, no como dato final de ese año).
+
+**Método de empalme** (`scripts/process_coparticipacion.py`, función
+`load_ipc_empalmado`): partiendo del valor de `ipc_promedio_anual` de 2016 ya publicado
+(100,0, por construcción — ver limitación de ese año en "Metodología de deflactación"),
+se encadena **hacia atrás** año por año usando las tasas de variación % anual *tal como
+figuran en el archivo fuente* (no se recalculan a partir de niveles, para no introducir
+redondeos propios):
+
+1. 2015 a 2007: `nivel[año-1] = nivel[año] / (1 + var_tabla_B[año])`.
+2. 2006 a 2003: `nivel[año-1] = nivel[año] / (1 + var_tabla_A[año])`, continuando desde
+   el nivel de 2006 obtenido en el paso anterior.
+
+El resultado (índice promedio anual, base implícita = promedio 2016 de este proyecto):
+2003→8,40, 2004→8,77, 2005→9,61, 2006→10,66, 2007→12,19, 2008→14,98, 2009→17,46,
+2010→21,38, 2011→26,57, 2012→32,79, 2013→40,85, 2014→56,98, 2015→73,66, 2016→100,00 — una
+suba acumulada de ~11,9 veces entre 2003 y 2016, consistente en orden de magnitud con la
+inflación acumulada conocida de Argentina en ese período.
+
+**Limitación no resuelta**: ambas tablas del archivo Ferreres marcan algunos años con un
+asterisco (2015 y 2016 en la Tabla A) y una nota "* Ver metodología", pero el archivo
+recibido **no incluye ninguna hoja de metodología** que explique qué ajuste implica ese
+asterisco. No se pudo verificar su significado exacto ni la metodología completa de
+construcción de la Tabla B (estimaciones privadas) más allá de lo que puede inferirse de
+los propios números. Se documenta esta limitación de forma explícita en vez de asumir
+una explicación.
+
+**No se usó** el resto de la Tabla A (años anteriores a 2003, con datos hasta ~1810) ni
+la hoja "IPC Nacional" del mismo archivo (que replica la serie oficial 2016-2025 ya
+usada en el proyecto) — ver el motivo del corte en 2003 en la sección anterior.
 
 ### Definición de "coparticipación" usada en este análisis
 
@@ -104,8 +161,8 @@ excluyen del análisis, que trabaja únicamente con las 23 provincias + CABA.
 
 ### Valores faltantes
 
-`scripts/process_coparticipacion.py` verifica explícitamente que existan las 240
-combinaciones esperadas (24 jurisdicciones × 10 años, 2016-2025) y también que haya IPC
+`scripts/process_coparticipacion.py` verifica explícitamente que existan las 552
+combinaciones esperadas (24 jurisdicciones × 23 años, 2003-2025) y también que haya IPC
 disponible para cada año antes de deflactar. Al momento de escribir esto, **no faltó
 ninguna combinación** — si en el futuro se detectara alguna, el script corta la
 ejecución con un aviso explícito en vez de completarla silenciosamente.
@@ -181,19 +238,22 @@ como Córdoba**. Esta limitación se documenta también, de forma visible, en
 - **Fórmula**: `monto_real = monto_nominal × (IPC_promedio_2016 / IPC_promedio_año)`,
   donde `IPC_promedio_año` es el promedio simple de los 12 valores mensuales del IPC
   Nacional, Nivel General, de ese año.
-- **Fuente del IPC**: `data/raw/ipc/serie_ipc_divisiones.csv`, filtrado a
-  `Region == "Nacional"` y `Descripcion == "NIVEL GENERAL"`.
+- **Fuente del IPC**: 2016-2025, `data/raw/ipc/serie_ipc_divisiones.csv`, filtrado a
+  `Region == "Nacional"` y `Descripcion == "NIVEL GENERAL"`; 2003-2015, empalmado desde
+  `data/raw/ipc/fundacion_norte_y_sur_orlando_ferreres.xlsx` (ver "Empalme del IPC
+  2003-2015" arriba).
 
 ## Metodología por núcleo
 
-### Núcleo 1 — Serie histórica de coparticipación (2016-2025)
+### Núcleo 1 — Serie histórica de coparticipación (2003-2025)
 
 - Unidad de análisis: provincia × año.
 - Fuente nominal: RON, filtrado a los conceptos de coparticipación definidos arriba
   (ver "Definición de 'coparticipación' usada en este análisis").
-- Deflactado con IPC Nacional Nivel General, base promedio 2016 = 100.
-- Alcance temporal acotado a 2016-2025 por disponibilidad de datos (ver "Supuestos y
-  limitaciones" arriba).
+- Deflactado con IPC empalmado (INDEC 2016-2025 + Ferreres/Norte y Sur 2003-2015), base
+  promedio 2016 = 100.
+- Alcance temporal 2003-2025: no llega a 1990 por falta de una fuente de montos
+  nominales de coparticipación anterior a 2003 (ver "Supuestos y limitaciones" arriba).
 - Script de procesamiento: `scripts/process_coparticipacion.py`.
 - Notebook: `notebooks/01_serie_historica.ipynb`.
 
