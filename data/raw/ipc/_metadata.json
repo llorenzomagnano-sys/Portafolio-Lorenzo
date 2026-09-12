@@ -4,6 +4,15 @@
   "fecha_incorporacion_al_repo": "2026-08-20",
   "archivos": [
     {
+      "archivo": "fundacion_norte_y_sur_orlando_ferreres.xlsx",
+      "fuente": "Fundación Norte y Sur / Orlando J. Ferreres, provisto directamente por el usuario (no descargado por script, no se verificó una URL pública de origen)",
+      "fecha_incorporacion": "2026-09-12",
+      "descripcion": "Base de series históricas de precios de Argentina. Hoja \"IPC \" (con espacio al final) contiene dos tablas anuales relevantes: (A) \"Índice de Precios al Consumidor GBA (INDEC)\", continua ~1810-2025, base dic-2016=100 -- para 2007-2014 reproduce las mismas tasas bajas y desacreditadas del IPC oficial de la época, es decir NO está corregida; (B) \"Índice de Precios al Consumidor GBA (estimaciones privadas)\", 2006-2025, base dic-2015=100 -- para 2007-2015 reporta tasas mucho más altas, consistentes con las estimaciones privadas contemporáneas al período de intervención del INDEC. Ambas tablas tienen años marcados con asterisco y una nota \"* Ver metodología\" que no se pudo resolver: el archivo no incluye ninguna hoja de metodología. Limitación documentada, no se asumió su significado.",
+      "cobertura": "tabla A: ~1810-2025 anual; tabla B: 2006-2025 anual",
+      "usado_en_nucleo_1": true,
+      "uso": "deflactor de la serie de coparticipación 2003-2015: tabla A para 2003-2006 (tramo confiable, pre-intervención), tabla B para 2007-2015 (tramo de desconfianza estadística sobre el IPC oficial). Ver docs/methodology.md, sección de empalme. El resto de la hoja (datos anteriores a 2003, y la hoja \"IPC Nacional\" que replica la serie oficial 2016-2025 ya usada) no se incorpora al pipeline."
+    },
+    {
       "archivo": "serie_ipc_divisiones.csv",
       "fuente": "INDEC, https://www.indec.gob.ar/ftp/cuadros/economia/serie_ipc_divisiones.csv",
       "descripcion": "IPC por división de consumo y región, metodología vigente desde dic-2016. Incluye Region=\"Nacional\", Codigo=0 \"NIVEL GENERAL\".",

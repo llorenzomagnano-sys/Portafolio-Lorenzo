@@ -39,14 +39,22 @@ end-to-end todavía, así que conviene revisar su salida la primera vez que se u
 
 ### Índice de Precios al Consumidor (IPC)
 
-- **Organismo**: INDEC.
-- **Archivo usado**: `ipc/serie_ipc_divisiones.csv` — Region="Nacional", Nivel General,
-  cobertura mensual diciembre 2016 en adelante.
-- **Nota importante**: el IPC nacional oficial de Argentina **no tiene cobertura
-  confiable antes de diciembre 2016** con las fuentes que se pudieron conseguir (ver
-  `docs/methodology.md`, sección "Supuestos y limitaciones", para el detalle de por qué
-  se descartaron varias fuentes alternativas). Por eso el Núcleo 1 se acotó a
-  **2016-2025**.
+- **2016-2025 — INDEC**: `ipc/serie_ipc_divisiones.csv` — Region="Nacional", Nivel
+  General, cobertura mensual diciembre 2016 en adelante. El IPC nacional oficial de
+  Argentina no tiene cobertura confiable antes de diciembre 2016 con las fuentes que se
+  pudieron conseguir directamente de INDEC (ver `docs/methodology.md`, sección
+  "Confiabilidad del IPC oficial en el período 2007-2015", para el detalle).
+- **2003-2015 — Fundación Norte y Sur / Orlando Ferreres**:
+  `ipc/fundacion_norte_y_sur_orlando_ferreres.xlsx`, hoja `IPC `. Provisto directamente
+  por el usuario. Se usa para empalmar el IPC hacia atrás desde 2016: tramo 2004-2006
+  desde la tabla "GBA (INDEC)" (pre-intervención, confiable), tramo 2007-2016 desde la
+  tabla "GBA (estimaciones privadas)" (sustituye al IPC oficial de esos años, que está
+  ampliamente desacreditado por la intervención del INDEC). Ver `docs/methodology.md`,
+  sección "Empalme del IPC 2003-2015", para el método exacto y una limitación sin
+  resolver sobre el archivo (una nota "Ver metodología" que no se pudo verificar).
+- Con este empalme, el Núcleo 1 pasó de **2016-2025** a **2003-2025**. No llega a 1990
+  porque no hay fuente de montos nominales de coparticipación anterior a 2003 (ver
+  sección de RON arriba).
 
 ## Otros archivos en esta carpeta (no usados en el Núcleo 1)
 
