@@ -155,7 +155,8 @@ def calcular_sensibilidad(anio_referencia: int, escenarios: list[float]) -> pd.D
     ingreso provincial total de Córdoba, usando el año de referencia indicado.
 
     La masa coparticipable base se estima igual que en el Núcleo 3 (notebook de
-    validación IARAF): "gross-up" de la coparticipación nominal efectivamente recibida
+    validación contra una cifra pública de recaudación): "gross-up" de la
+    coparticipación nominal efectivamente recibida
     por las 24 jurisdicciones en `anio_referencia`, dividiendo por la suma de sus 24
     coeficientes (porque esos coeficientes representan solo la porción de la masa total
     que va a las provincias, el resto es Nación + Fondo ATN).

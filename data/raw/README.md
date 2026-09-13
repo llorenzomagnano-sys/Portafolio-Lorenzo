@@ -1,8 +1,6 @@
 # data/raw — trazabilidad de fuentes
 
-Esta carpeta contiene datos descargados sin procesar. **Nunca se editan a mano.** Cada
-subcarpeta corresponde a una fuente y tiene su propio `_metadata.json` con el origen
-exacto de cada archivo.
+Esta carpeta tiene los datos crudos, tal como los conseguí. Nunca se editan a mano. Cada subcarpeta corresponde a una fuente y tiene su propio `_metadata.json` con el origen exacto de cada archivo.
 
 ## Estado de las fuentes (Núcleo 1)
 
@@ -11,72 +9,32 @@ exacto de cada archivo.
 | Coparticipación / RON — Secretaría de Hacienda | `data/raw/coparticipacion/` | **Datos reales incorporados** (ver detalle abajo) |
 | IPC — INDEC | `data/raw/ipc/` | **Datos reales incorporados** (ver detalle abajo) |
 
-### Cómo se obtuvieron
+### Cómo los conseguí
 
-`scripts/download_coparticipacion.py` y `scripts/download_ipc.py` existen y están
-documentados, pero **no pudieron correrse desde el entorno de desarrollo**: no tiene
-acceso de salida (egress) a `argentina.gob.ar`, `indec.gob.ar` ni a la mayoría de los
-dominios externos (política de red de la sesión). En su lugar, el usuario descargó los
-archivos manualmente desde su propio navegador y los subió al chat, desde donde se
-copiaron a esta carpeta. Cada `_metadata.json` documenta esto explícitamente
-(`obtenido_por`, `motivo`).
+Escribí `scripts/download_coparticipacion.py` y `scripts/download_ipc.py`, pero no pude correrlos desde el entorno donde armé este proyecto: no tiene salida a internet hacia `argentina.gob.ar`, `indec.gob.ar` ni la mayoría de los dominios externos. Así que terminé descargando los archivos a mano desde mi propia máquina y copiándolos acá. Cada `_metadata.json` lo deja anotado (`obtenido_por`, `motivo`).
 
-Si en el futuro se corre este proyecto desde un entorno con acceso a internet, los
-scripts de descarga deberían poder reemplazar este paso manual — pero no se probaron
-end-to-end todavía, así que conviene revisar su salida la primera vez que se usen.
+Si en algún momento corro este proyecto desde un entorno con acceso a internet, los scripts de descarga deberían poder reemplazar ese paso manual — pero no los probé de punta a punta, así que conviene revisar bien la salida la primera vez que se usen.
 
 ### Coparticipación federal / Recursos de Origen Nacional (RON)
 
 - **Organismo**: Secretaría de Hacienda, Ministerio de Economía de la Nación.
 - **URL de origen**: <https://www.argentina.gob.ar/economia/sechacienda/asuntosprovinciales/ron>
-- **Archivo usado**: `coparticipacion/serie_ron_2003_2025.csv` — 2003 a 2025, un registro
-  por provincia/año/concepto (20 conceptos distintos de RON, no solo coparticipación
-  Ley 23.548). El detalle de qué conceptos se usan para este núcleo está en
-  `docs/methodology.md`.
-- **Contexto normativo**: distribución automática y diaria bajo el régimen de la Ley
-  23.548 (1988) y modificaciones posteriores (p. ej., compensación por el Consenso
-  Fiscal desde 2018). El archivo agrega esa distribución diaria a nivel anual.
+- **Archivo usado**: `coparticipacion/serie_ron_2003_2025.csv` — 2003 a 2025, un registro por provincia/año/concepto (20 conceptos distintos de RON, no solo coparticipación Ley 23.548). Qué conceptos uso exactamente para este núcleo está detallado en `docs/methodology.md`.
+- **Contexto normativo**: distribución automática y diaria bajo el régimen de la Ley 23.548 (1988) y modificaciones posteriores (por ejemplo, la compensación por el Consenso Fiscal desde 2018). El archivo agrega esa distribución diaria a nivel anual.
 
 ### Índice de Precios al Consumidor (IPC)
 
-- **2016-2025 — INDEC**: `ipc/serie_ipc_divisiones.csv` — Region="Nacional", Nivel
-  General, cobertura mensual diciembre 2016 en adelante. El IPC nacional oficial de
-  Argentina no tiene cobertura confiable antes de diciembre 2016 con las fuentes que se
-  pudieron conseguir directamente de INDEC (ver `docs/methodology.md`, sección
-  "Confiabilidad del IPC oficial en el período 2007-2015", para el detalle).
-- **2003-2015 — Fundación Norte y Sur / Orlando Ferreres**:
-  `ipc/fundacion_norte_y_sur_orlando_ferreres.xlsx`, hoja `IPC `. Provisto directamente
-  por el usuario. Se usa para empalmar el IPC hacia atrás desde 2016: tramo 2004-2006
-  desde la tabla "GBA (INDEC)" (pre-intervención, confiable), tramo 2007-2016 desde la
-  tabla "GBA (estimaciones privadas)" (sustituye al IPC oficial de esos años, que está
-  ampliamente desacreditado por la intervención del INDEC). Ver `docs/methodology.md`,
-  sección "Empalme del IPC 2003-2015", para el método exacto y una limitación sin
-  resolver sobre el archivo (una nota "Ver metodología" que no se pudo verificar).
-- Con este empalme, el Núcleo 1 pasó de **2016-2025** a **2003-2025**. No llega a 1990
-  porque no hay fuente de montos nominales de coparticipación anterior a 2003 (ver
-  sección de RON arriba).
+- **2016-2025 — INDEC**: `ipc/serie_ipc_divisiones.csv` — Region="Nacional", Nivel General, cobertura mensual desde diciembre de 2016. El IPC oficial de Argentina no tiene cobertura confiable antes de esa fecha con las fuentes a las que pude acceder directamente de INDEC (el detalle está en `docs/methodology.md`, en la parte sobre la confiabilidad del IPC oficial en 2007-2015).
+- **2003-2015 — Fundación Norte y Sur / Orlando Ferreres**: `ipc/fundacion_norte_y_sur_orlando_ferreres.xlsx`, hoja `IPC `, que me pasaron directamente. La uso para empalmar el IPC hacia atrás desde 2016: el tramo 2004-2006 sale de la tabla "GBA (INDEC)" (pre-intervención, confiable), y el tramo 2007-2016 de la tabla "GBA (estimaciones privadas)" (reemplaza al IPC oficial de esos años, bastante desacreditado por la intervención del INDEC). El método exacto, y una limitación que no pude resolver sobre una nota del archivo ("Ver metodología" sin hoja de metodología adjunta), están en `docs/methodology.md`.
+- Con este empalme, el Núcleo 1 pasó de cubrir 2016-2025 a cubrir 2003-2025. No llega a 1990 porque no encontré ninguna fuente de montos nominales de coparticipación anterior a 2003 (ver la sección de RON arriba).
 
 ### Ingresos corrientes de Córdoba (proxy, Núcleo 4)
 
-- **Organismo**: Dirección General de Rentas de la Provincia de Córdoba (archivo
-  provisto directamente por el usuario, ya construido con anterioridad).
-- **Archivo usado**: `ingresos_cordoba/serie_recaudacion_provincial.xlsx`, hoja
-  `Serie_Mensual` — recaudación mensual, enero 2015 a agosto 2026. Para el Núcleo 4 se
-  usan solo años calendario completos, 2015-2025.
-- **Nombre real distinto del anticipado**: el usuario había dicho que subiría
-  `dgeyc_ingresos_cordoba.xlsx`; el archivo real se llama
-  `Serie-recaudacion-provincial_Ene15-Ago26.xlsx` — se confirmó con el usuario que es
-  la fuente correcta antes de integrarla.
-- **Limitación de alcance**: la fila "Total" usada como proxy de "ingresos corrientes
-  totales" excluye lo recaudado por otros organismos públicos provinciales (p. ej.
-  EPEC), según la propia nota al pie del archivo. Ver `docs/methodology.md`, sección
-  del Núcleo 4, para el detalle completo (incluida la corrección de unidades: el
-  archivo dice "millones de pesos" pero son pesos).
+- **Organismo**: Dirección General de Rentas de la Provincia de Córdoba (archivo que ya tenía armado de antes y usé acá).
+- **Archivo usado**: `ingresos_cordoba/serie_recaudacion_provincial.xlsx`, hoja `Serie_Mensual` — recaudación mensual, enero 2015 a agosto 2026. Para el Núcleo 4 uso solo años calendario completos, 2015-2025.
+- **El nombre del archivo no era el que esperaba**: pensaba que se iba a llamar `dgeyc_ingresos_cordoba.xlsx`, pero el archivo real se llama `Serie-recaudacion-provincial_Ene15-Ago26.xlsx` — confirmé que era la fuente correcta antes de usarla.
+- **Limitación de alcance**: la fila "Total" que uso como proxy de "ingresos corrientes totales" excluye lo recaudado por otros organismos públicos provinciales (por ejemplo, EPEC), según la propia nota al pie del archivo. El detalle completo — incluida la corrección de unidades, porque el archivo dice "millones de pesos" pero en realidad son pesos — está en `docs/methodology.md`, sección del Núcleo 4.
 
 ## Otros archivos en esta carpeta (no usados en el Núcleo 1)
 
-Se conservan como referencia para núcleos futuros o para revisar la decisión de acotar
-el alcance temporal. Cada uno está documentado en el `_metadata.json` de su carpeta con
-el motivo puntual por el que se descartó (insuficiente cobertura temporal, o -- en el
-caso de las series del Banco Mundial vía FRED -- una inconsistencia económica detectada
-en los propios datos, no un error de descarga).
+Los conservo como referencia para el futuro, o por si en algún momento quiero revisar la decisión de acotar el alcance temporal. Cada uno tiene documentado en su `_metadata.json` el motivo puntual por el que lo descarté — cobertura temporal insuficiente, o, en el caso de las series del Banco Mundial vía FRED, una inconsistencia económica que encontré en los propios datos, no un error mío al descargarlos.
