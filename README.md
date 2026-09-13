@@ -1,107 +1,80 @@
 # Portafolio-Lorenzo
 
-Análisis del régimen de coparticipación federal de impuestos en Argentina, con foco en la provincia de Córdoba.
+Análisis de datos del régimen de coparticipación federal de impuestos en Argentina, con foco en la provincia de Córdoba.
 
 ## Objetivo del proyecto
 
-Este repositorio existe como pieza de portfolio técnico para postular a consultoras de análisis fiscal (perfil IERAL, IARAF). El proyecto aborda el problema económico de la distribución de recursos tributarios entre Nación y provincias bajo el régimen de coparticipación federal, evaluando su evolución histórica, su impacto en las cuentas provinciales y su sensibilidad ante cambios en las reglas de reparto, con aplicación concreta al caso de Córdoba.
+Este repositorio es una pieza de portfolio técnico para postular a consultoras de análisis fiscal (perfil IERAL, IARAF). Aborda un problema concreto de economía pública argentina — cómo se reparten los recursos tributarios entre Nación y provincias bajo el régimen de coparticipación federal (Ley 23.548) — desde cuatro ángulos complementarios: su evolución histórica, si cada provincia recibe en proporción a lo que aporta, qué tan sensible es el reparto a shocks de recaudación, y qué tan expuesta queda una provincia concreta (Córdoba) a esos shocks. Puede servirle a alguien evaluando perfiles para análisis fiscal/económico como muestra de trabajo con datos públicos argentinos: limpieza y trazabilidad de fuentes, decisiones metodológicas explícitas, y comunicación de resultados con sus limitaciones a la vista.
+
+## Principales hallazgos
+
+- **Serie histórica (2003-2025)**: la coparticipación real recibida por Córdoba (pesos constantes, base 2016) pasó de $13.421 millones en 2003 a un pico de $54.809 millones en 2022, y cerró 2025 en $46.306 millones — casi 3,5 veces el nivel de 2003, pero un 15% por debajo del pico de 2022.
+- **Aporte vs. recibo por provincia**: Córdoba aporta el 8,6% del PBG nacional pero recibe solo el 5,0% de la coparticipación — una brecha de -3,5 puntos porcentuales, la tercera peor del país después de Buenos Aires y CABA.
+- **Simulador de sensibilidad**: validado contra la caída de recaudación del primer cuatrimestre de 2026 reportada por IARAF, el modelo estima que una caída del 8,6% en la recaudación nacional coparticipable le cuesta a Córdoba unos $120.100 millones de pesos.
+- **Dependencia fiscal de Córdoba (2015-2025)**: la coparticipación pasó de explicar el 36,0% de los ingresos corrientes de Córdoba en 2015 a un pico de 51,6% en 2022-2024, y bajó a 46,5% en 2025 (último año analizado). Con ese nivel de dependencia, una caída del 10% en la recaudación nacional coparticipable reduce los ingresos corrientes totales de la provincia en aproximadamente 4,7%.
 
 ## Núcleos de análisis
 
-| Núcleo | Descripción | Estado |
+| Núcleo | Descripción | Notebook |
 |---|---|---|
-| 1 | Serie histórica de coparticipación | completo |
-| 2 | Aporte vs. recibo por provincia | completo |
-| 3 | Simulador de sensibilidad | completo |
-| 4 | Peso de la coparticipación en las cuentas de Córdoba | completo |
+| 1 | Serie histórica de coparticipación (2003-2025) | [`01_serie_historica.ipynb`](notebooks/01_serie_historica.ipynb) |
+| 2 | Aporte vs. recibo por provincia | [`02_aporte_vs_recibo.ipynb`](notebooks/02_aporte_vs_recibo.ipynb) |
+| 3 | Simulador de sensibilidad | [`03_simulador_sensibilidad.ipynb`](notebooks/03_simulador_sensibilidad.ipynb) |
+| 4 | Peso de la coparticipación en las cuentas de Córdoba | [`04_dependencia_fiscal_cordoba.ipynb`](notebooks/04_dependencia_fiscal_cordoba.ipynb) |
 
-### Núcleo 1 — Serie histórica de coparticipación (2003-2025)
+Metodología completa (fuentes, supuestos y limitaciones de cada núcleo) en [`docs/methodology.md`](docs/methodology.md).
 
-Muestra la evolución de la coparticipación federal recibida por Córdoba en pesos
-constantes, y la compara contra Buenos Aires, Santa Fe y Mendoza. El rango original
-(2016-2025) se amplió a 2003-2025 al incorporar una fuente de IPC confiable para
-2007-2015 (Fundación Norte y Sur / Orlando Ferreres), que reemplaza al IPC oficial de
-ese tramo — ampliamente desacreditado por la intervención del INDEC. No llega a 1990
-porque no existe una fuente de montos nominales de coparticipación anterior a 2003 (ver
-[`docs/methodology.md`](docs/methodology.md) para el detalle completo del empalme y de
-esta limitación). Notebook:
-[`notebooks/01_serie_historica.ipynb`](notebooks/01_serie_historica.ipynb).
+### Núcleo 1 — Serie histórica de coparticipación
 
 ![Coparticipación real recibida por Córdoba, 2003-2025](output/figures/cordoba_evolucion_real_2003_2025.png)
 
 ### Núcleo 2 — Aporte vs. recibo por provincia
 
-Compara el peso económico de cada provincia (PBG, 2024) contra lo que recibe por
-coparticipación (coeficiente Ley 23.548). Córdoba aporta 8,6% del PBG nacional pero
-recibe solo 5,0% de la coparticipación — una brecha de -3,5 puntos porcentuales, la
-tercera peor del país después de Buenos Aires y CABA. El análisis documenta
-explícitamente la limitación del PBG como proxy del aporte tributario real (ver
-[`docs/methodology.md`](docs/methodology.md)). Notebook:
-[`notebooks/02_aporte_vs_recibo.ipynb`](notebooks/02_aporte_vs_recibo.ipynb).
-
 ![Coparticipación recibida vs. PBG aportado, por provincia](output/figures/aporte_vs_recibo_ranking.png)
 
 ### Núcleo 3 — Simulador de sensibilidad
-
-Un simulador (`scripts/simulator.py`, con tests automáticos) que calcula cómo se
-reparte entre provincias un shock de recaudación tributaria nacional coparticipable.
-Se validó contra la caída de recaudación real del primer cuatrimestre de 2026
-reportada por IARAF ($5,1 billones de caída total, $1,4 billones menos de
-coparticipación): la variación real implícita (~-8,6%) y la tasa de "coparticipabilidad"
-implícita (~46,7%) resultan consistentes con lo esperable, aunque —documentado
-explícitamente— es un chequeo de consistencia interna y no una validación contra una
-fuente independiente de recaudación coparticipable de 2026. Para ese shock, Córdoba
-pierde del orden de $120 mil millones de pesos. Incluye un simulador interactivo
-(slider de `ipywidgets`) para explorar otros escenarios. Notebook:
-[`notebooks/03_simulador_sensibilidad.ipynb`](notebooks/03_simulador_sensibilidad.ipynb).
 
 ![Impacto de la caída de recaudación del primer cuatrimestre de 2026, por provincia](output/figures/simulador_validacion_1cuatrimestre2026.png)
 
 ### Núcleo 4 — Peso de la coparticipación en las cuentas de Córdoba
 
-Calcula qué porcentaje de los ingresos corrientes totales de Córdoba proviene de la
-coparticipación federal (2015-2025), y usa el simulador del Núcleo 3 para traducir un
-shock de recaudación nacional en un impacto sobre el ingreso provincial total. La
-coparticipación pasó de representar el 36% de los ingresos corrientes de Córdoba en
-2015 a un pico de ~52% en 2022-2024, y bajó a 46,5% en 2025 — un nivel de dependencia
-moderado, coherente con que Córdoba tiene una base tributaria propia significativa
-(~42-44% de sus ingresos) pero sigue dependiendo de Nación para la mayor parte de su
-financiamiento. Con ese nivel de dependencia, una caída del 10% en la recaudación
-nacional coparticipable le cuesta a Córdoba aproximadamente 4,7% de sus ingresos
-corrientes totales. "Ingresos corrientes totales" es una proxy (recaudación
-administrada por la Dirección General de Rentas, excluye lo recaudado por otros
-organismos como EPEC) — ver [`docs/methodology.md`](docs/methodology.md) para el
-detalle completo. Notebook:
-[`notebooks/04_dependencia_fiscal_cordoba.ipynb`](notebooks/04_dependencia_fiscal_cordoba.ipynb).
-
 ![Coparticipación como % de los ingresos corrientes de Córdoba, 2015-2025](output/figures/dependencia_fiscal_cordoba.png)
+
+## Simulador interactivo
+
+El Núcleo 3 incluye un simulador interactivo (slider de `ipywidgets`) dentro de `notebooks/03_simulador_sensibilidad.ipynb` — se eligió esa opción en vez de una app Streamlit separada para mantener todo el proyecto reproducible desde notebooks, sin depender de un proceso servidor aparte (ver la justificación completa en `docs/methodology.md`). No hay, por lo tanto, ninguna app Streamlit para deployar en este proyecto. Si en el futuro se quisiera una versión web del simulador (además de la interactiva del notebook), los pasos serían:
+
+1. Extraer la lógica de `scripts/simulator.py` (ya está aislada y sin dependencias de notebook) a un pequeño script `app.py` con `streamlit` como única dependencia nueva de UI.
+2. Probar localmente con `streamlit run app.py`.
+3. Crear una cuenta en [Streamlit Community Cloud](https://streamlit.io/cloud), conectar este repositorio de GitHub, y apuntar el deploy a `app.py` — es gratuito para repositorios públicos.
+4. Agregar el link resultante acá, en esta sección.
 
 ## Estructura del repositorio
 
 ```
-data/raw/          # Datos descargados sin procesar. Nunca se editan a mano.
-data/processed/    # Datos limpios, listos para análisis.
-scripts/           # Código reutilizable: descarga, limpieza, cálculo.
-notebooks/         # Notebooks exploratorios, uno por núcleo temático.
-docs/              # Metodología, supuestos, fuentes.
-output/figures/    # Gráficos exportados.
+data/raw/          # Datos crudos, tal como se obtuvieron. Nunca se editan a mano.
+data/processed/    # Datos limpios, generados por los scripts de scripts/.
+scripts/           # Código reutilizable: descarga (no verificada), procesamiento, simulador, tests.
+notebooks/         # Un notebook por núcleo temático, con los gráficos e interpretación.
+docs/              # Metodología: fuentes, supuestos y limitaciones de cada núcleo.
+output/figures/    # Gráficos exportados (PNG), embebidos en este README y en los notebooks.
+run_all.py         # Corre todo el pipeline de procesamiento + notebooks con un solo comando.
 ```
 
 ## Fuentes de datos
 
-- **Secretaría de Hacienda / Ministerio de Economía de la Nación** — coparticipación /
-  Recursos de Origen Nacional por provincia (usada en el Núcleo 1).
-- **INDEC** — Índice de Precios al Consumidor, usado como deflactor 2016-2025 (Núcleo 1).
-- **Fundación Norte y Sur / Orlando Ferreres** — Índice de Precios al Consumidor,
-  empalmado con el de INDEC para deflactar 2003-2015 (Núcleo 1), tramo en el que el IPC
-  oficial está desacreditado por la intervención del INDEC.
-- **CEPAL** (metodología base INDEC) — Producto Bruto Geográfico por provincia (Núcleo 2).
-- Documento tipo Secretaría de Hacienda / BNA — coeficientes de coparticipación Ley 23.548 (Núcleo 2).
-- Dirección General de Rentas de Córdoba — recaudación e ingresos corrientes provinciales (Núcleo 4).
+| Fuente | Organismo | Núcleo(s) |
+|---|---|---|
+| [Coparticipación / Recursos de Origen Nacional (RON)](https://www.argentina.gob.ar/economia/sechacienda/asuntosprovinciales/ron) | Secretaría de Hacienda, Ministerio de Economía de la Nación | 1, 3, 4 |
+| [Índice de Precios al Consumidor, 2016-2025](https://www.indec.gob.ar/ftp/cuadros/economia/serie_ipc_divisiones.csv) | INDEC | 1 |
+| Índice de Precios al Consumidor, 2003-2015 (archivo provisto por el autor, sin URL pública verificada) | Fundación Norte y Sur / Orlando J. Ferreres | 1 |
+| Producto Bruto Geográfico por provincia (`Jurisdiccion_52sectores.xlsx`, archivo provisto por el autor) | CEPAL, sobre metodología base de INDEC | 2 |
+| Índices de distribución de la coparticipación federal (`indices_copa_2018.pdf`, archivo provisto por el autor) | Documento tipo Secretaría de Hacienda / BNA | 2, 3, 4 |
+| Recaudación provincial (`serie_recaudacion_provincial.xlsx`, archivo provisto por el autor) | Dirección General de Rentas de Córdoba | 4 |
 
-Detalle completo de trazabilidad de cada fuente en [`data/raw/README.md`](data/raw/README.md).
+Ninguna de estas fuentes tiene una licencia restrictiva conocida para su uso en un análisis de este tipo (son estadísticas públicas o compilaciones de acceso que el autor ya tenía), pero no todas tienen una URL pública verificada de origen — el detalle exacto de cómo se obtuvo cada archivo, con qué alcance temporal y qué limitaciones tiene, está en [`data/raw/README.md`](data/raw/README.md) y en [`docs/methodology.md`](docs/methodology.md).
 
-## Cómo correr el proyecto
+## Cómo correr el proyecto de punta a punta
 
 ```bash
 # Clonar el repositorio
@@ -115,18 +88,26 @@ source venv/bin/activate      # En Windows: venv\Scripts\activate
 # Instalar dependencias
 pip install -r requirements.txt
 
-# Levantar Jupyter para explorar los notebooks
-jupyter notebook
-
-# Correr los tests del simulador (Núcleo 3)
-pytest scripts/test_simulator.py
+# Correr todo el pipeline: procesamiento de los 4 núcleos + tests + regeneración
+# de los 4 notebooks (con sus gráficos). data/raw/ ya viene poblada en el repo.
+python run_all.py
 ```
+
+Para explorar de forma interactiva en vez de solo regenerar: `jupyter notebook` y abrir cualquiera de los notebooks de `notebooks/`. Para correr solo los tests del simulador: `pytest scripts/test_simulator.py`.
+
+## Limitaciones metodológicas (resumen)
+
+Cada una de estas se documenta en detalle, con la decisión tomada y su razón, en [`docs/methodology.md`](docs/methodology.md):
+
+- **Núcleo 1** no llega a 1990 (el pedido original) porque no existe una fuente de montos nominales de coparticipación por provincia para 1990-2002; el rango quedó en 2003-2025. El tramo 2003-2015 depende de un IPC empalmado con una fuente privada (Ferreres/Norte y Sur) para 2007-2015, porque el IPC oficial de esos años está desacreditado por la intervención del INDEC.
+- **Núcleo 2** usa el PBG como proxy del aporte tributario real, que tiene un problema de atribución geográfica conocido (las empresas suelen tributar donde tienen sede fiscal, no donde generan la actividad económica) — probablemente infla el aporte de CABA y subestima el de provincias productivas como Córdoba.
+- **Núcleo 3** valida el simulador contra una única fuente (IARAF, un cuatrimestre) mediante una calibración/chequeo de consistencia interna, no contra una fuente independiente de recaudación coparticipable real — se documenta así explícitamente en vez de sobrevender la validación.
+- **Núcleo 4** usa como "ingresos corrientes totales" de Córdoba una proxy (recaudación administrada por la Dirección General de Rentas) que excluye lo recaudado por otros organismos provinciales como EPEC, y el indicador de sensibilidad es una simplificación de primera ronda que no modela respuestas de política provincial ante una caída de ingresos.
 
 ## Licencia
 
-Este proyecto está bajo licencia MIT. Ver [LICENSE](LICENSE) para más detalles.
+Este proyecto está bajo licencia MIT. Ver [LICENSE](LICENSE) para más detalles. Los datos de `data/raw/` conservan la licencia/términos de sus fuentes originales (estadísticas públicas u organismos oficiales); no se redistribuyen bajo la licencia MIT del código.
 
 ## Autor
 
-**[Lorenzo Magnano]**
-[LinkedIn: Lorenzo Magnano]
+**Lorenzo Magnano**
