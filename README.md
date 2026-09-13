@@ -10,9 +10,9 @@ Este repositorio es una pieza de portfolio técnico para postular a consultoras 
 
 ## Principales hallazgos
 
-- **Serie histórica (2003-2025)**: la coparticipación real recibida por Córdoba (pesos constantes, base 2016) pasó de $13.421 millones en 2003 a un pico de $54.809 millones en 2022, y cerró 2025 en $46.306 millones — casi 3,5 veces el nivel de 2003, pero un 15% por debajo del pico de 2022.
+- **Serie histórica (2003-2025)**: la coparticipación real recibida por Córdoba (pesos constantes, base 2016) pasó de $13.421 millones en 2003 a un pico de $54.809 millones en 2022, y cerró 2025 en $46.306 millones — casi 3,5 veces el nivel de 2003. En términos relativos (indexado a 2003=100) Córdoba creció prácticamente igual que Buenos Aires, Santa Fe y Mendoza (entre 335 y 357 puntos en 2025): el patrón responde a la dinámica agregada del régimen, no a diferencias entre provincias.
 - **Aporte vs. recibo por provincia**: Córdoba aporta el 8,6% del PBG nacional pero recibe solo el 5,0% de la coparticipación — una brecha de -3,5 puntos porcentuales, la tercera peor del país después de Buenos Aires y CABA.
-- **Simulador de sensibilidad**: validado contra la caída de recaudación del primer cuatrimestre de 2026 reportada por IARAF, el modelo estima que una caída del 8,6% en la recaudación nacional coparticipable le cuesta a Córdoba unos $120.100 millones de pesos.
+- **Simulador de sensibilidad**: validado contra la caída de recaudación del primer cuatrimestre de 2026 reportada por IARAF, el modelo estima que una caída del 8,6% en la recaudación nacional coparticipable le cuesta a Córdoba unos $120.100 millones de pesos — un 8,7% de lo que recibe hoy, prácticamente igual que las demás provincias salvo CABA (-11,5%, un eco de su coeficiente ajustado en el Núcleo 2).
 - **Dependencia fiscal de Córdoba (2015-2025)**: la coparticipación pasó de explicar el 36,0% de los ingresos corrientes de Córdoba en 2015 a un pico de 51,6% en 2022-2024, y bajó a 46,5% en 2025 (último año analizado). Con ese nivel de dependencia, una caída del 10% en la recaudación nacional coparticipable reduce los ingresos corrientes totales de la provincia en aproximadamente 4,7%.
 
 ## Núcleos de análisis
@@ -30,17 +30,23 @@ Metodología completa (fuentes, supuestos y limitaciones de cada núcleo) en [`d
 
 ![Coparticipación real recibida por Córdoba, 2003-2025](output/figures/cordoba_evolucion_real_2003_2025.png)
 
+Comparación en niveles absolutos y, para no dejar que Buenos Aires tape todo por su tamaño, indexada a 2003=100:
+
+![Coparticipación real por provincia, indexada a 2003=100](output/figures/comparativo_provincias_indexado_2003_2025.png)
+
 ### Núcleo 2 — Aporte vs. recibo por provincia
 
 ![Coparticipación recibida vs. PBG aportado, por provincia](output/figures/aporte_vs_recibo_ranking.png)
 
 ### Núcleo 3 — Simulador de sensibilidad
 
-![Impacto de la caída de recaudación del primer cuatrimestre de 2026, por provincia](output/figures/simulador_validacion_1cuatrimestre2026.png)
+En pesos absolutos y como % de lo que cada provincia recibe hoy (esta segunda vista es la que responde "qué tan grave es esto para cada una"):
+
+![Impacto de la caída de recaudación del primer cuatrimestre de 2026, por provincia, en pesos y en términos relativos](output/figures/simulador_validacion_1cuatrimestre2026.png)
 
 Demo del simulador interactivo (slider de `ipywidgets` en el notebook) recorriendo distintos escenarios de shock, generada con `scripts/build_demo_gif.py`:
 
-![Demo del simulador interactivo recorriendo distintos escenarios de shock](output/figures/simulador_interactivo_demo.gif)
+![Demo del simulador interactivo mostrando el impacto como % de los ingresos corrientes de Córdoba](output/figures/simulador_interactivo_demo.gif)
 
 ### Núcleo 4 — Peso de la coparticipación en las cuentas de Córdoba
 

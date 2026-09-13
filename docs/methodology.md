@@ -121,6 +121,14 @@ inflación acumulada conocida de Argentina en ese período.
   IPC para cada año antes de deflactar. Al momento de escribir esto, no faltó ninguna
   — si en el futuro faltara alguna, el script corta la ejecución con un aviso explícito
   en vez de completarla silenciosamente.
+- **Comparación entre provincias en términos relativos**: el notebook incluye, además
+  del gráfico en niveles absolutos (donde Buenos Aires domina solo por su tamaño), un
+  segundo gráfico indexando cada provincia a su propio valor de 2003 (= 100). En ese
+  formato las cuatro provincias de referencia son casi indistinguibles (335-357 puntos
+  en 2025), lo que confirma que el patrón de la serie responde a la dinámica agregada
+  del régimen de coparticipación, no a diferencias entre provincias — sin esto, el
+  gráfico absoluto por sí solo podría sugerir (incorrectamente) que Buenos Aires
+  "le va mejor" en el régimen, cuando solo es más grande en nivel.
 - Script de procesamiento: `scripts/process_coparticipacion.py`. Notebook:
   `notebooks/01_serie_historica.ipynb`.
 
@@ -220,7 +228,22 @@ nominal 2025 ya calculada en el Núcleo 1.
 - **Interfaz interactiva**: un slider de `ipywidgets` dentro del notebook, en vez de
   una app Streamlit aparte — mantiene todo el proyecto reproducible desde notebooks,
   sin depender de un proceso servidor adicional.
+- **Impacto en términos relativos**: además del gráfico en pesos absolutos (donde
+  Buenos Aires domina solo por tener el coeficiente más grande), el notebook usa el
+  parámetro `coparticipacion_actual_por_provincia` de `simular_shock` — antes sin usar
+  en este notebook — para graficar el impacto como % de lo que cada provincia recibe
+  hoy. Esa vista muestra que 23 de las 24 jurisdicciones caen dentro de una banda
+  angosta (~8,0%-8,9%), muy cerca de la variación % del shock, porque el reparto es
+  proporcional al coeficiente de cada una. La excepción es CABA (~11,5%): no es un
+  supuesto del simulador, sino un eco de que su coeficiente fue corregido manualmente
+  en el Núcleo 2 (1,4% en vez del 3,75% del documento fuente), por lo que ya no guarda
+  con lo que CABA recibió en 2025 la misma proporción que sí mantienen las demás
+  provincias.
 - Notebook: `notebooks/03_simulador_sensibilidad.ipynb`.
+- **Demo animada** (`scripts/build_demo_gif.py`, no forma parte del pipeline de datos):
+  genera un GIF de presentación para el README mostrando el simulador recorriendo
+  varios escenarios, con el impacto expresado como % de los ingresos corrientes
+  totales de Córdoba (Núcleo 4) — la lectura relativa, no la absoluta en pesos.
 
 ### Supuestos y limitaciones
 
