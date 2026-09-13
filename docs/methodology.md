@@ -36,6 +36,10 @@ en [`data/raw/README.md`](../data/raw/README.md).
 - **IPC 2003-2015**: Fundación Norte y Sur / Orlando J. Ferreres, provisto directamente
   por el autor (sin URL pública verificada). Archivo:
   `data/raw/ipc/fundacion_norte_y_sur_orlando_ferreres.xlsx`, hoja `IPC `.
+  **Atribución**: compilación histórica de series económicas de Argentina realizada
+  por Orlando J. Ferreres para la Fundación Norte y Sur (conocido por su obra de
+  referencia *"Dos siglos de Economía Argentina"*) — se usa como insumo de análisis,
+  sin reclamar autoría sobre la compilación original.
 
 Fecha de incorporación: 20 de agosto de 2026 (rango original 2016-2025), ampliado a
 2003-2025 el 12 de septiembre de 2026.

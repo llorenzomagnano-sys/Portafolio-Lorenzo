@@ -1,5 +1,7 @@
 # Portafolio-Lorenzo
 
+[![CI](https://github.com/llorenzomagnano-sys/Portafolio-Lorenzo/actions/workflows/ci.yml/badge.svg)](https://github.com/llorenzomagnano-sys/Portafolio-Lorenzo/actions/workflows/ci.yml)
+
 Análisis de datos del régimen de coparticipación federal de impuestos en Argentina, con foco en la provincia de Córdoba.
 
 ## Objetivo del proyecto
@@ -35,6 +37,10 @@ Metodología completa (fuentes, supuestos y limitaciones de cada núcleo) en [`d
 ### Núcleo 3 — Simulador de sensibilidad
 
 ![Impacto de la caída de recaudación del primer cuatrimestre de 2026, por provincia](output/figures/simulador_validacion_1cuatrimestre2026.png)
+
+Demo del simulador interactivo (slider de `ipywidgets` en el notebook) recorriendo distintos escenarios de shock, generada con `scripts/build_demo_gif.py`:
+
+![Demo del simulador interactivo recorriendo distintos escenarios de shock](output/figures/simulador_interactivo_demo.gif)
 
 ### Núcleo 4 — Peso de la coparticipación en las cuentas de Córdoba
 
@@ -73,6 +79,8 @@ run_all.py         # Corre todo el pipeline de procesamiento + notebooks con un 
 | Recaudación provincial (`serie_recaudacion_provincial.xlsx`, archivo provisto por el autor) | Dirección General de Rentas de Córdoba | 4 |
 
 Ninguna de estas fuentes tiene una licencia restrictiva conocida para su uso en un análisis de este tipo (son estadísticas públicas o compilaciones de acceso que el autor ya tenía), pero no todas tienen una URL pública verificada de origen — el detalle exacto de cómo se obtuvo cada archivo, con qué alcance temporal y qué limitaciones tiene, está en [`data/raw/README.md`](data/raw/README.md) y en [`docs/methodology.md`](docs/methodology.md).
+
+**Atribución**: la serie de precios 2003-2015 usada en el Núcleo 1 se basa en la compilación histórica de series económicas de Argentina realizada por **Orlando J. Ferreres** para la **Fundación Norte y Sur**, conocido por su obra de referencia *"Dos siglos de Economía Argentina"*. Este proyecto usa esos datos únicamente como insumo de análisis (un índice de precios empalmado con fuentes oficiales, ver metodología) y no reclama autoría sobre la compilación original.
 
 ## Cómo correr el proyecto de punta a punta
 

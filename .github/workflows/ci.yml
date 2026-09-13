@@ -1,0 +1,27 @@
+name: CI
+
+# Corre el pipeline completo del proyecto (procesamiento de los 4 núcleos, tests del
+# simulador, y regeneración de los 4 notebooks) en cada push y pull request, para
+# comprobar que el repositorio es reproducible de punta a punta con run_all.py. No
+# hace falta acceso a internet: data/raw/ ya viene versionada en el repositorio.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Correr el pipeline completo (run_all.py)
+        run: python run_all.py
