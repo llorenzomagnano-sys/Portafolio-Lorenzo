@@ -244,6 +244,20 @@ nominal 2025 ya calculada en el Núcleo 1.
   genera un GIF de presentación para el README mostrando el simulador recorriendo
   varios escenarios, con el impacto expresado como % de los ingresos corrientes
   totales de Córdoba (Núcleo 4) — la lectura relativa, no la absoluta en pesos.
+- **Simulador interactivo standalone** (página web, sin depender de Jupyter): reimplementa
+  en JavaScript, del lado del cliente, la misma fórmula de `simular_shock` — sin ninguna
+  dependencia de Python — para que se pueda mover el slider desde el navegador. A
+  diferencia del GIF (que usa el impacto sobre los ingresos corrientes totales de
+  Córdoba, Núcleo 4), esta versión reproduce exactamente el mismo cálculo que la
+  sección de validación del notebook: usa `recaudacion_base` y la coparticipación
+  actual de Córdoba, ambas escaladas a un cuatrimestre (misma ventana que IARAF), y
+  expresa el impacto como % de lo que Córdoba recibe hoy — el mismo -8,7% / -$120.100
+  millones ya citados arriba para el escenario validado. **Limitación explícita**: las
+  tres constantes que usa (`recaudacion_base` de 4 meses, coparticipación actual de
+  Córdoba de 4 meses, coeficiente de Córdoba) son una foto fija de los datos 2025 ya
+  procesados en este repositorio al momento de publicarlo — si se incorporan años
+  posteriores, hay que recalcularlas y republicar la página a mano, no se actualizan
+  solas.
 
 ### Supuestos y limitaciones
 

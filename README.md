@@ -48,6 +48,8 @@ Demo del simulador interactivo (slider de `ipywidgets` en el notebook) recorrien
 
 ![Demo del simulador interactivo mostrando el impacto como % de los ingresos corrientes de Córdoba](output/figures/simulador_interactivo_demo.gif)
 
+**[Probar el simulador interactivo en el navegador →](https://claude.ai/code/artifact/a3bb99d1-699f-4ce6-96b9-b9086ee63e35)** — misma fórmula de `simular_shock`, reimplementada en JavaScript sin depender de Jupyter; reproduce el escenario validado contra IARAF (-8,6% de shock → -8,7% de la coparticipación de Córdoba). Los datos que usa son una foto fija de 2025 (ver limitación en `docs/methodology.md`); el detalle completo con las 24 jurisdicciones sigue estando en el notebook.
+
 ### Núcleo 4 — Peso de la coparticipación en las cuentas de Córdoba
 
 ![Coparticipación como % de los ingresos corrientes de Córdoba, 2015-2025](output/figures/dependencia_fiscal_cordoba.png)
