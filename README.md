@@ -15,7 +15,7 @@ Lo organicé en cuatro preguntas que se van encadenando: cómo evolucionó en el
 - **Serie histórica (2003-2025)**: la coparticipación real recibida por Córdoba (pesos constantes, base 2016) pasó de $13.421 millones en 2003 a un pico de $54.809 millones en 2022, y cerró 2025 en $46.306 millones — casi 3,5 veces el nivel de 2003. En términos relativos (indexado a 2003=100), sin embargo, Córdoba creció prácticamente igual que Buenos Aires, Santa Fe y Mendoza (entre 335 y 357 puntos en 2025): el salto responde a la dinámica agregada del régimen, no a algo particular de cada provincia.
 - **Aporte vs. recibo por provincia**: Córdoba aporta el 8,6% del PBG nacional pero recibe solo el 5,0% de la coparticipación — una brecha de -3,5 puntos porcentuales, la tercera peor del país después de Buenos Aires y CABA.
 - **Simulador de sensibilidad**: usando como referencia una caída de recaudación real de comienzos de 2026 (una cifra que dio a conocer IARAF), el modelo estima que una baja del 8,6% en la recaudación nacional coparticipable le cuesta a Córdoba unos $120.100 millones de pesos — un 8,7% de lo que recibe hoy, casi igual que el resto de las provincias salvo CABA (-11,5%, eco de su coeficiente ajustado en el Núcleo 2).
-- **Dependencia fiscal de Córdoba (2015-2025)**: la coparticipación pasó de explicar el 36,0% de los ingresos corrientes de Córdoba en 2015 a un pico de 51,6% en 2022-2024, y bajó a 46,5% en 2025 (último año analizado). Con ese nivel de dependencia, una caída del 10% en la recaudación nacional coparticipable reduce los ingresos corrientes totales de la provincia en aproximadamente 4,7%.
+- **Dependencia fiscal de Córdoba (2015-2025)**: la coparticipación pasó de explicar el 36,0% de los ingresos corrientes de Córdoba en 2015 a un pico de 51,6% en 2022-2024, y bajó a 46,5% en 2025 (último año analizado). Con ese nivel de dependencia, una caída del 10% en la recaudación nacional coparticipable reduce los ingresos corrientes totales de la provincia en aproximadamente 4,7%. En pesos constantes, esa mayor dependencia no viene de una recaudación provincial estancada (creció 11,6% real entre 2015 y 2025, aunque de forma irregular): viene de que la coparticipación recibida creció bastante más rápido en poder de compra, un 44,1% real en el mismo período.
 
 ## Núcleos de análisis
 
@@ -55,6 +55,10 @@ Demo del simulador (slider de `ipywidgets` en el notebook) recorriendo distintos
 ### Núcleo 4 — Peso de la coparticipación en las cuentas de Córdoba
 
 ![Coparticipación como % de los ingresos corrientes de Córdoba, 2015-2025](output/figures/dependencia_fiscal_cordoba.png)
+
+El ratio de arriba da igual en pesos nominales o reales (la inflación se cancela en la división), pero para ver si cada serie creció o cayó en poder de compra hace falta mirar los niveles en pesos constantes:
+
+![Recaudación provincial y coparticipación de Córdoba, en pesos constantes base 2016](output/figures/dependencia_fiscal_cordoba_real.png)
 
 ## Simulador interactivo
 

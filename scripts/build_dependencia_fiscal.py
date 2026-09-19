@@ -22,11 +22,23 @@ UNIDADES: el archivo fuente rotula sus valores como "millones de pesos corriente
 pero son en realidad PESOS corrientes (verificado cruzando la fila de coparticipación
 del archivo contra el Núcleo 1 -- ver docs/methodology.md).
 
-NUMERADOR: se usa `monto_nominal` (no `monto_real_base2016`) de
-`data/processed/coparticipacion_real.csv` para Córdoba. El ratio "% de los ingresos que
-es coparticipación" debe calcularse con magnitudes del mismo tipo (nominal sobre
-nominal) -- usar la serie deflactada en el numerador contra un denominador nominal
-distorsionaría el ratio sin ningún motivo válido.
+RATIO (`ratio_coparticipacion_ingresos`): se calcula `monto_nominal / ingresos_totales`
+(nominal sobre nominal, mismo año). Esto es intencional y no cambia si se recalcula en
+pesos reales: al deflactar numerador y denominador por el mismo IPC del mismo año, el
+factor de deflactación se cancela en la división -- `(nominal_num / ipc) /
+(nominal_den / ipc) == nominal_num / nominal_den`. Por eso el ratio no tiene una
+versión "real" distinta; lo que sí aporta información nueva es ver el NIVEL de cada
+serie en pesos constantes (ver columnas reales abajo), que el ratio por sí solo no deja
+ver (una dependencia estable en % puede convivir con una recaudación real creciendo o
+cayendo).
+
+COLUMNAS REALES (`coparticipacion_real_base2016_pesos`,
+`ingresos_totales_real_base2016_pesos`): pesos constantes, base = promedio 2016 = 100,
+misma base y misma fuente de IPC que usa el Núcleo 1 (`load_ipc_empalmado` en
+`process_coparticipacion.py`). La de coparticipación se reutiliza directo de
+`monto_real_base2016` en `data/processed/coparticipacion_real.csv` (ya calculada ahí,
+no se recalcula acá); la de ingresos totales se deflacta acá mismo con la misma
+fórmula: `monto_real = monto_nominal × (ipc_promedio_2016 / ipc_promedio_año)`.
 
 ALCANCE: 2015-2025 (11 años), intersección entre lo que cubre el archivo de recaudación
 provincial (desde ene-2015) y el Núcleo 1 (hasta 2025). 2026 queda afuera del ratio
@@ -39,7 +51,8 @@ Entradas:
 Salida:
   - data/processed/dependencia_fiscal_cordoba.csv
     columnas: anio, coparticipacion_nominal_pesos, ingresos_totales_pesos,
-    ratio_coparticipacion_ingresos
+    ratio_coparticipacion_ingresos, coparticipacion_real_base2016_pesos,
+    ingresos_totales_real_base2016_pesos
 """
 import sys
 from pathlib import Path
@@ -51,6 +64,7 @@ sys.path.insert(0, str(BASE_DIR / "scripts"))
 
 from coeficientes_ley23548 import COEFICIENTES_COPARTICIPACION  # noqa: E402
 from simulator import simular_shock  # noqa: E402
+from process_coparticipacion import load_ipc_empalmado  # noqa: E402
 
 COPART_PATH = BASE_DIR / "data" / "processed" / "coparticipacion_real.csv"
 INGRESOS_PATH = BASE_DIR / "data" / "raw" / "ingresos_cordoba" / "serie_recaudacion_provincial.xlsx"
@@ -124,11 +138,24 @@ def load_ingresos_totales_anuales() -> pd.DataFrame:
 
 def build_ratio() -> pd.DataFrame:
     copart = pd.read_csv(COPART_PATH)
-    copart_cordoba = copart[copart["provincia"] == "Córdoba"][["anio", "monto_nominal"]].copy()
+    copart_cordoba = copart[copart["provincia"] == "Córdoba"][
+        ["anio", "monto_nominal", "monto_real_base2016"]
+    ].copy()
     copart_cordoba["coparticipacion_nominal_pesos"] = copart_cordoba["monto_nominal"] * 1e6
-    copart_cordoba = copart_cordoba.drop(columns=["monto_nominal"])
+    copart_cordoba["coparticipacion_real_base2016_pesos"] = (
+        copart_cordoba["monto_real_base2016"] * 1e6
+    )
+    copart_cordoba = copart_cordoba.drop(columns=["monto_nominal", "monto_real_base2016"])
 
     ingresos = load_ingresos_totales_anuales()
+
+    ipc = load_ipc_empalmado()
+    ipc_2016 = float(ipc.loc[ipc["anio"] == 2016, "ipc_promedio_anual"].iloc[0])
+    ingresos = ingresos.merge(ipc, on="anio", how="left")
+    ingresos["ingresos_totales_real_base2016_pesos"] = ingresos["ingresos_totales_pesos"] * (
+        ipc_2016 / ingresos["ipc_promedio_anual"]
+    )
+    ingresos = ingresos.drop(columns=["ipc_promedio_anual"])
 
     combinado = copart_cordoba.merge(ingresos, on="anio", how="inner")
     combinado = combinado[
