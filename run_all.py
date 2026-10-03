@@ -64,7 +64,8 @@ def main() -> None:
     for notebook in NOTEBOOKS:
         run(
             f"Regenerar notebook: {notebook}",
-            ["jupyter", "nbconvert", "--to", "notebook", "--execute", "--inplace", notebook],
+            ["jupyter", "nbconvert", "--to", "notebook", "--execute", "--inplace",
+             "--ExecutePreprocessor.timeout=300", notebook],
             cwd=NOTEBOOKS_DIR,
         )
 
