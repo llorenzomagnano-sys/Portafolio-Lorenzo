@@ -8,7 +8,11 @@ que la serie en pesos no puede arrancar antes de 2003 aunque el índice de
 precios sí podría reconstruirse más atrás.
 
 El IPC nacional oficial confiable (serie_ipc_divisiones.csv) solo cubre desde
-diciembre de 2016. Para 2007-2015 el IPC oficial de la época está ampliamente
+diciembre de 2016, así que no tiene un promedio 2016 propiamente dicho: el "promedio"
+de ese año sería el valor de diciembre, ~10% más alto que el promedio real. Para no
+arrastrar ese sesgo, el nivel promedio de 2016 se estima como el promedio oficial 2017
+dividido por (1 + variación 2017 de la tabla de estimaciones privadas de Ferreres), y
+todo el empalme hacia atrás parte de ese valor. Para 2007-2015 el IPC oficial de la época está ampliamente
 desacreditado (intervención del INDEC, ver docs/methodology.md). Para llegar a
 2003 con un deflactor confiable se empalma un IPC de tres tramos, usando la
 base de Fundación Norte y Sur / Orlando Ferreres para 2003-2015:
@@ -16,10 +20,9 @@ base de Fundación Norte y Sur / Orlando Ferreres para 2003-2015:
     confiable).
   - 2007-2015: tabla "GBA (estimaciones privadas)" del mismo archivo (sustituye
     al IPC oficial desacreditado de ese tramo).
-  - 2016-2025: IPC oficial nacional ya usado (serie_ipc_divisiones.csv), sin
-    modificar.
-El empalme se ancla exactamente al valor ya publicado de 2016 (ver
-load_ipc_empalmado() y docs/methodology.md para el detalle y las tasas usadas).
+  - 2017-2025: IPC oficial nacional (serie_ipc_divisiones.csv), sin modificar.
+  - 2016: promedio estimado como se explica arriba.
+Detalle y tasas usadas en load_ipc_empalmado() y docs/methodology.md.
 
 Definición de "coparticipación" usada acá (decisión documentada, no es la única
 posible): suma de los conceptos que Hacienda reporta bajo
@@ -61,13 +64,13 @@ IPC_FERRERES_SHEET = "IPC "
 # Años cuya variación % anual se toma de cada tabla del archivo Ferreres:
 #   - tabla A ("GBA (INDEC)"): tramo 2004-2006, pre-intervención, confiable.
 #     Se usa para encadenar hacia atrás desde 2006 hasta 2003.
-#   - tabla B ("GBA (estimaciones privadas)"): tramo 2007-2016. Se usa para
-#     encadenar hacia atrás desde el valor de 2016 ya publicado hasta 2006,
+#   - tabla B ("GBA (estimaciones privadas)"): tramo 2007-2017. La variación
+#     2017 estima el promedio 2016 a partir del promedio oficial 2017; las de
+#     2007-2016 encadenan hacia atrás desde ese promedio 2016 hasta 2006,
 #     porque para 2007-2015 el IPC oficial de la época está desacreditado
-#     (ver docs/methodology.md). El año 2016 se incluye solo para anclar el
-#     empalme al dato ya existente, no se usa como valor final de 2016.
+#     (ver docs/methodology.md).
 IPC_FERRERES_ANIOS_TABLA_A = [2004, 2005, 2006]
-IPC_FERRERES_ANIOS_TABLA_B = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016]
+IPC_FERRERES_ANIOS_TABLA_B = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017]
 
 CONCEPTOS_COPARTICIPACION = {
     "coparticipacion federal de impuestos ley 23548",
@@ -176,8 +179,8 @@ def load_ipc_promedio_anual() -> pd.DataFrame:
     for anio, meses in meses_por_anio.items():
         if meses < 12:
             print(
-                f"AVISO: el año {anio} tiene solo {meses} mes(es) de IPC disponibles "
-                "(promedio calculado igual, documentado en methodology.md)."
+                f"AVISO: el año {anio} tiene solo {meses} mes(es) de IPC oficial; su "
+                "promedio se estima en load_ipc_empalmado()."
             )
 
     promedio = nivel_general.groupby("anio", as_index=False)["Indice_IPC"].mean()
@@ -229,20 +232,20 @@ def load_ipc_ferreres_var_pct() -> tuple[dict, dict]:
 
 
 def load_ipc_empalmado() -> pd.DataFrame:
-    """Construye ipc_promedio_anual para 2003-2025 empalmando tres fuentes
-    (ver docstring del módulo y docs/methodology.md):
-      - 2016-2025: IPC oficial nacional ya usado (sin modificar).
-      - 2007-2015: encadenado hacia atrás desde el valor de 2016 usando las
-        tasas de la tabla "estimaciones privadas" de Ferreres.
-      - 2003-2006: encadenado hacia atrás desde el valor resultante de 2006
-        usando las tasas de la tabla "GBA (INDEC)" de Ferreres.
-    El empalme queda anclado exactamente al valor de 2016 ya publicado; no se
-    recalculan ni modifican los años 2016-2025.
+    """Construye ipc_promedio_anual para 2003-2025 (ver docstring del módulo y
+    docs/methodology.md):
+      - 2017-2025: IPC oficial nacional, sin modificar.
+      - 2016: promedio oficial 2017 / (1 + var. 2017 de la tabla "estimaciones
+        privadas" de Ferreres). El oficial solo trae diciembre de 2016.
+      - 2007-2015: encadenado hacia atrás desde 2016 con las tasas de la tabla
+        "estimaciones privadas".
+      - 2003-2006: encadenado hacia atrás desde 2006 con las tasas de la tabla
+        "GBA (INDEC)".
     """
     ipc_oficial = load_ipc_promedio_anual()
-    if 2016 not in set(ipc_oficial["anio"]):
-        raise SystemExit("No hay IPC oficial para 2016; no se puede anclar el empalme.")
-    nivel = {2016: float(ipc_oficial.loc[ipc_oficial["anio"] == 2016, "ipc_promedio_anual"].iloc[0])}
+    if 2017 not in set(ipc_oficial["anio"]):
+        raise SystemExit("No hay IPC oficial para 2017; no se puede anclar el empalme.")
+    ipc_2017 = float(ipc_oficial.loc[ipc_oficial["anio"] == 2017, "ipc_promedio_anual"].iloc[0])
 
     var_tabla_a, var_tabla_b = load_ipc_ferreres_var_pct()
 
@@ -254,6 +257,7 @@ def load_ipc_empalmado() -> pd.DataFrame:
             f"tabla B {faltantes_b}. No se completan con supuestos."
         )
 
+    nivel = {2017: ipc_2017}
     for anio in sorted(IPC_FERRERES_ANIOS_TABLA_B, reverse=True):
         nivel[anio - 1] = nivel[anio] / (1 + var_tabla_b[anio])
     for anio in sorted(IPC_FERRERES_ANIOS_TABLA_A, reverse=True):
@@ -263,9 +267,10 @@ def load_ipc_empalmado() -> pd.DataFrame:
         {"anio": list(nivel.keys()), "ipc_promedio_anual": list(nivel.values())}
     )
     empalmado = empalmado[
-        (empalmado["anio"] >= SCOPE_START_YEAR) & (empalmado["anio"] < 2016)
+        (empalmado["anio"] >= SCOPE_START_YEAR) & (empalmado["anio"] <= 2016)
     ]
-    return pd.concat([empalmado, ipc_oficial], ignore_index=True).sort_values("anio")
+    oficial = ipc_oficial[ipc_oficial["anio"] >= 2017]
+    return pd.concat([empalmado, oficial], ignore_index=True).sort_values("anio").reset_index(drop=True)
 
 
 def main() -> None:

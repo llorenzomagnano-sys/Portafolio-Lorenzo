@@ -1,4 +1,4 @@
-# Portafolio-Lorenzo
+# Coparticipación federal: el caso de Córdoba
 
 [![CI](https://github.com/llorenzomagnano-sys/Portafolio-Lorenzo/actions/workflows/ci.yml/badge.svg)](https://github.com/llorenzomagnano-sys/Portafolio-Lorenzo/actions/workflows/ci.yml)
 
@@ -12,10 +12,10 @@ Lo organicé en cuatro preguntas que se van encadenando: cómo evolucionó en el
 
 ## Principales hallazgos
 
-- **Serie histórica (2003-2025)**: la coparticipación real recibida por Córdoba (pesos constantes, base 2016) pasó de $13.421 millones en 2003 a un pico de $54.809 millones en 2022, y cerró 2025 en $46.306 millones — casi 3,5 veces el nivel de 2003. En términos relativos (indexado a 2003=100), sin embargo, Córdoba creció prácticamente igual que Buenos Aires, Santa Fe y Mendoza (entre 335 y 357 puntos en 2025): el salto responde a la dinámica agregada del régimen, no a algo particular de cada provincia.
+- **Serie histórica (2003-2025)**: la coparticipación real recibida por Córdoba (pesos constantes de 2016) pasó de $13.421 millones en 2003 a un máximo de $49.955 millones en 2022, y cerró 2025 en $42.205 millones, 3,1 veces el nivel de 2003. En términos relativos (indexado a 2003=100), sin embargo, Córdoba creció prácticamente igual que Buenos Aires, Santa Fe y Mendoza (entre 306 y 325 puntos en 2025): el salto responde a la dinámica agregada del régimen, no a algo particular de cada provincia.
 - **Aporte vs. recibo por provincia**: comparando la porción de cada provincia en lo que se reparte entre provincias con su peso en el PBG, Córdoba queda prácticamente empatada: recibe el 8,58% del reparto y representa el 8,56% del PBG. Las que quedan claramente por debajo son CABA (−17,5 pp), Buenos Aires (−10,6 pp) y Neuquén (−2,7 pp); las que más reciben en relación a su PBG, Chaco, Formosa y Tucumán (cerca de +3 pp cada una).
 - **Simulador de sensibilidad**: calibrado con la caída de recaudación de comienzos de 2026 que dio a conocer IARAF, una baja de ~8,6% en la recaudación nacional coparticipable le cuesta a Córdoba unos $120.100 millones en un cuatrimestre. Como el reparto es proporcional, todas las provincias pierden el mismo porcentaje de lo que les corresponde; lo que cambia la gravedad del golpe es cuánto depende cada una de la coparticipación (Núcleo 4).
-- **Dependencia fiscal de Córdoba (2015-2025)**: la coparticipación pasó de explicar el 36,0% de los ingresos de Córdoba en 2015 a un máximo de 45,2% en 2023-2024, y bajó a 40,4% en 2025. En pesos constantes, la suba se explica sobre todo por la recaudación propia, que cayó un 20% entre 2017 y 2020 y recién se recuperó en 2025, mientras la coparticipación seguía creciendo. Con la dependencia de 2025, una caída del 10% en la recaudación nacional coparticipable reduce los ingresos totales de la provincia en un 4,0%.
+- **Dependencia fiscal de Córdoba (2015-2025)**: la coparticipación pasó de explicar el 36,0% de los ingresos de Córdoba en 2015 a un máximo de 45,2% en 2023-2024, y bajó a 40,4% en 2025. En pesos constantes, la suba se explica sobre todo por la recaudación propia, que cayó un 20% entre 2017 y 2020 y se mantuvo cerca de ese piso hasta 2024, mientras la coparticipación seguía creciendo. Con la dependencia de 2025, una caída del 10% en la recaudación nacional coparticipable reduce los ingresos totales de la provincia en un 4,0%.
 
 ## Núcleos de análisis
 
@@ -69,7 +69,7 @@ El Núcleo 3 tiene un simulador interactivo (slider de `ipywidgets`) dentro de `
 ```
 data/raw/          # Datos crudos, tal como se obtuvieron. Nunca se editan a mano.
 data/processed/    # Datos limpios, generados por los scripts de scripts/.
-scripts/           # Procesamiento de cada núcleo, simulador y tests.
+scripts/           # Procesamiento de cada núcleo, simulador y tests (simulador + consistencia de datos).
 notebooks/         # Un notebook por núcleo temático, con los gráficos e interpretación.
 docs/              # Metodología, y el simulador web (docs/simulador/, publicado con GitHub Pages).
 output/figures/    # Gráficos exportados (PNG), embebidos en este README y en los notebooks.
@@ -110,13 +110,13 @@ pip install -r requirements.txt
 python run_all.py
 ```
 
-Para explorar de forma interactiva en vez de solo regenerar: `jupyter notebook` y abrir cualquiera de los notebooks de `notebooks/`. Para correr solo los tests del simulador: `pytest scripts/test_simulator.py`.
+Para explorar de forma interactiva en vez de solo regenerar: `jupyter notebook` y abrir cualquiera de los notebooks de `notebooks/`. Para correr solo los tests (simulador y chequeos de consistencia de los datos procesados): `pytest scripts/`.
 
 ## Limitaciones metodológicas (resumen)
 
 Cada una de estas se documenta en detalle, con la decisión tomada y su razón, en [`docs/methodology.md`](docs/methodology.md):
 
-- **Núcleo 1** no llega a 1990 (la idea original) porque no existe una fuente de montos nominales de coparticipación por provincia para 1990-2002; el rango quedó en 2003-2025. El tramo 2003-2015 depende de un IPC empalmado con una fuente privada (Ferreres/Norte y Sur) para 2007-2015, porque el IPC oficial de esos años quedó desacreditado por la intervención del INDEC. Además, la serie de Hacienda que uso refleja lo que Nación informa haber transferido: desde 2018 supera en 14-17% a la coparticipación que registra la propia Córdoba (ver Núcleo 4).
+- **Núcleo 1** no llega a 1990 (la idea original) porque no existe una fuente de montos nominales de coparticipación por provincia para 1990-2002; el rango quedó en 2003-2025. El tramo 2003-2016 depende de un IPC empalmado con una fuente privada (Ferreres/Norte y Sur), porque el IPC oficial de 2007-2015 quedó desacreditado por la intervención del INDEC y el actual recién arranca en diciembre de 2016. Además, la serie de Hacienda que uso refleja lo que Nación informa haber transferido: desde 2018 supera en 14-17% a la coparticipación que registra la propia Córdoba (ver Núcleo 4).
 - **Núcleo 2** usa el PBG como proxy del aporte tributario real, que tiene un problema de atribución geográfica conocido: las empresas suelen tributar donde tienen sede fiscal, no donde generan la actividad económica. Eso probablemente infla el aporte de CABA y subestima el de provincias productivas como Córdoba.
 - **Núcleo 3** es un modelo lineal y proporcional, calibrado con una sola cifra pública (un cuatrimestre de recaudación). Es una calculadora de escenarios, no un modelo validado contra una serie independiente.
 - **Núcleo 4** usa como proxy de "ingresos corrientes totales" de Córdoba la recaudación administrada por la Dirección General de Rentas, que excluye lo recaudado por otros organismos provinciales como EPEC. Desde 2018, además, la coparticipación que informa Nación para Córdoba supera en 14-17% a la que registra la provincia, y no identifiqué por qué; el ratio usa solo la fuente provincial. El indicador de sensibilidad es una simplificación de primera ronda: no modela ninguna respuesta de política provincial ante una caída de ingresos.
@@ -128,3 +128,5 @@ Este proyecto está bajo licencia MIT. Ver [LICENSE](LICENSE) para más detalles
 ## Autor
 
 **Lorenzo Magnano**
+
+El código lo escribí con asistencia de herramientas de IA. Las preguntas, la elección y el control de las fuentes y los criterios metodológicos son míos.
