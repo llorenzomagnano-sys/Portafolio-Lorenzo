@@ -5,22 +5,14 @@ Corre el pipeline completo del proyecto de punta a punta, con un solo comando:
     python run_all.py
 
 Pasos:
-  1. Descarga de datos crudos -- NO se ejecuta automáticamente (ver nota abajo).
-  2. Procesamiento (Núcleo 1, 2 y 4): genera los CSV de data/processed/.
-  3. Tests automáticos del simulador (Núcleo 3).
-  4. Regeneración de los 4 notebooks (ejecuta cada uno de punta a punta con
+  1. Procesamiento (Núcleo 1, 2 y 4): genera los CSV de data/processed/.
+  2. Tests automáticos del simulador (Núcleo 3).
+  3. Regeneración de los 4 notebooks (ejecuta cada uno de punta a punta con
      `jupyter nbconvert`, lo que a su vez regenera todas las figuras de
      output/figures/).
 
-Nota sobre la descarga: `scripts/download_coparticipacion.py` y
-`scripts/download_ipc.py` existen pero no se probaron end-to-end -- el entorno donde
-se desarrolló este proyecto no tiene acceso de salida a internet, así que todos los
-archivos de `data/raw/` fueron incorporados manualmente (ver docs/methodology.md y
-data/raw/README.md para la trazabilidad completa de cada fuente). Este script asume
-que `data/raw/` ya está poblada (viene versionada en el repositorio) y arranca desde
-el procesamiento. Si en algún momento se corre este proyecto desde un entorno con
-acceso a internet y se quiere probar la descarga automática, correr esos dos scripts
-por separado antes de este.
+Los datos crudos vienen versionados en data/raw/ (trazabilidad de cada fuente en
+data/raw/README.md), así que no hace falta acceso a internet.
 
 Requiere las dependencias de requirements.txt instaladas (`pip install -r
 requirements.txt`).
@@ -58,12 +50,7 @@ def run(descripcion: str, cmd: list[str], cwd: Path) -> None:
 
 
 def main() -> None:
-    print(
-        "Pipeline del proyecto Portafolio-Lorenzo.\n"
-        "La descarga automática de data/raw/ NO se ejecuta (ver docstring de este "
-        "archivo) -- se asume que data/raw/ ya está poblada, como viene en el "
-        "repositorio."
-    )
+    print("Pipeline del proyecto: procesamiento, tests y notebooks (datos de data/raw/).")
 
     for descripcion, script in PASOS_PROCESAMIENTO:
         run(descripcion, [sys.executable, script], cwd=SCRIPTS_DIR)

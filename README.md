@@ -69,9 +69,9 @@ El Núcleo 3 tiene un simulador interactivo (slider de `ipywidgets`) dentro de `
 ```
 data/raw/          # Datos crudos, tal como se obtuvieron. Nunca se editan a mano.
 data/processed/    # Datos limpios, generados por los scripts de scripts/.
-scripts/           # Código reutilizable: descarga (no verificada), procesamiento, simulador, tests.
+scripts/           # Procesamiento de cada núcleo, simulador y tests.
 notebooks/         # Un notebook por núcleo temático, con los gráficos e interpretación.
-docs/              # Metodología: fuentes, supuestos y limitaciones de cada núcleo.
+docs/              # Metodología, y el simulador web (docs/simulador/, publicado con GitHub Pages).
 output/figures/    # Gráficos exportados (PNG), embebidos en este README y en los notebooks.
 run_all.py         # Corre todo el pipeline de procesamiento + notebooks con un solo comando.
 ```

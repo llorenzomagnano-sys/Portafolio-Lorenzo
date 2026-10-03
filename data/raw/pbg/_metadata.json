@@ -1,7 +1,7 @@
 {
   "organismo": "CEPAL, sobre metodología base de INDEC (año base 2004)",
   "descripcion": "Desagregación provincial del Valor Agregado Bruto (VAB) de Argentina",
-  "obtenido_por": "usuario (búsqueda y descarga manual, no por script -- el entorno de desarrollo no tiene acceso de salida a internet)",
+  "obtenido_por": "búsqueda y descarga manual",
   "fecha_incorporacion_al_repo": "2026-08-24",
   "archivos": [
     {
@@ -12,7 +12,7 @@
       "jurisdicciones": "23 provincias + CABA + fila 'No distribuido' + fila 'Total'",
       "usado_en_nucleo_2": true,
       "uso": "proxy de 'aporte' de cada provincia: % de su VAB sobre el VAB total del país (año 2024, el más reciente disponible)",
-      "nota": "No es la publicación directa de INDEC (que solo llega hasta 2017 en su archivo público PIB_provincial_06_17.xls) -- es una actualización de CEPAL construida sobre la metodología oficial de INDEC. Documentado explícitamente por pedido del usuario."
+      "nota": "No es la publicación directa de INDEC (que solo llega hasta 2017 en su archivo público PIB_provincial_06_17.xls): es una actualización de CEPAL construida sobre la metodología oficial de INDEC."
     }
   ]
 }

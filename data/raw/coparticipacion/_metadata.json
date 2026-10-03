@@ -1,8 +1,7 @@
 {
   "source_page": "https://www.argentina.gob.ar/economia/sechacienda/asuntosprovinciales/ron",
   "organismo": "Secretaría de Hacienda, Ministerio de Economía de la Nación",
-  "obtenido_por": "usuario (descarga manual desde su navegador, no por scripts/download_coparticipacion.py)",
-  "motivo": "el entorno de desarrollo no tiene acceso de salida (egress) a argentina.gob.ar",
+  "obtenido_por": "descarga manual desde la página de origen",
   "fecha_incorporacion_al_repo": "2026-08-20",
   "archivos": [
     {

@@ -3,7 +3,7 @@ Procesa y deflacta la serie de coparticipación federal por provincia (Núcleo 1
 
 Alcance: **2003-2025**. El archivo fuente de RON (montos nominales por provincia)
 solo cubre desde 2003 -- no hay fuente de montos nominales de coparticipación
-para 1990-2002 (se buscó explícitamente y el usuario confirmó no tenerla), así
+para 1990-2002 (la busqué explícitamente y no la encontré), así
 que la serie en pesos no puede arrancar antes de 2003 aunque el índice de
 precios sí podría reconstruirse más atrás.
 

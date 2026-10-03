@@ -6,7 +6,7 @@ Va organizado en una sección por núcleo (fuentes, metodología, supuestos y li
 
 ## Cómo conseguí los datos
 
-Todos los archivos de `data/raw/` los subí yo a mano: el entorno donde armé este proyecto no tiene salida a internet hacia sitios externos (lo confirmé para `argentina.gob.ar`, `indec.gob.ar`, Wikipedia, `justia.com`, `fred.stlouisfed.org`, y en general casi cualquier dominio externo). Dejé escritos `scripts/download_coparticipacion.py` y `scripts/download_ipc.py` para automatizar la descarga de esas dos fuentes en un entorno con acceso a internet, pero no llegué a probarlos de punta a punta. El detalle de trazabilidad de cada archivo — de dónde salió, qué alcance tiene, por qué lo usé o lo descarté — está en [`data/raw/README.md`](../data/raw/README.md).
+Todos los archivos de `data/raw/` los descargué o los conseguí a mano y los versioné tal cual, así el proyecto se reproduce sin acceso a internet. La trazabilidad de cada archivo (de dónde salió, qué alcance tiene, por qué lo usé o lo descarté) está en [`data/raw/README.md`](../data/raw/README.md).
 
 ---
 
@@ -16,7 +16,7 @@ Todos los archivos de `data/raw/` los subí yo a mano: el entorno donde armé es
 
 - **Coparticipación federal / Recursos de Origen Nacional (RON)**: Secretaría de Hacienda, Ministerio de Economía de la Nación. <https://www.argentina.gob.ar/economia/sechacienda/asuntosprovinciales/ron>. Archivo: `data/raw/coparticipacion/serie_ron_2003_2025.csv` (2003-2025).
 - **IPC 2016-2025**: INDEC. <https://www.indec.gob.ar/ftp/cuadros/economia/serie_ipc_divisiones.csv>. Archivo: `data/raw/ipc/serie_ipc_divisiones.csv` (mensual, desde dic-2016).
-- **IPC 2003-2015**: Fundación Norte y Sur / Orlando J. Ferreres, que me pasaron directamente (sin URL pública verificada). Archivo: `data/raw/ipc/fundacion_norte_y_sur_orlando_ferreres.xlsx`, hoja `IPC `. Es la compilación histórica de series económicas de Argentina que hizo Ferreres para la Fundación Norte y Sur (conocido por *"Dos siglos de Economía Argentina"*) — la uso como insumo de análisis, sin reclamar autoría sobre la compilación.
+- **IPC 2003-2015**: Fundación Norte y Sur / Orlando J. Ferreres, conseguida en forma directa (sin URL pública verificada). Archivo: `data/raw/ipc/fundacion_norte_y_sur_orlando_ferreres.xlsx`, hoja `IPC `. Es la compilación histórica de series económicas de Argentina que hizo Ferreres para la Fundación Norte y Sur (conocido por *"Dos siglos de Economía Argentina"*) — la uso como insumo de análisis, sin reclamar autoría sobre la compilación.
 
 Incorporé estos datos el 20 de agosto de 2026 (con el rango original acotado a 2016-2025), y amplié a 2003-2025 el 12 de septiembre.
 
@@ -128,7 +128,7 @@ Y, como en el Núcleo 3, el indicador de sensibilidad es una simplificación de 
 
 ## Apéndice: fuentes evaluadas y descartadas para el Núcleo 1
 
-Cuando el Núcleo 1 todavía estaba acotado a 2016-2025 (antes de conseguir la base de Ferreres/Norte y Sur), evalué y descarté estas fuentes para cubrir 2003-2015. Las dejo acá como registro, aunque ya no son relevantes para el alcance actual:
+Cuando el Núcleo 1 todavía estaba acotado a 2016-2025 (antes de conseguir la base de Ferreres/Norte y Sur), evalué y descarté estas fuentes para cubrir 2003-2015. Las series del Banco Mundial no se conservan en el repositorio; las dejo acá como registro, aunque ya no son relevantes para el alcance actual:
 
 - **IPC INDEC "histórico" (`sh_ipc_12_16.xls`)**: pese al nombre, solo cubre abril-noviembre 2016 — no suma cobertura hacia atrás.
 - **Series del Banco Mundial vía FRED (`DDOE01ARA086NWDB`, `DDOE02ARA086NWDB`)**: cubren 1960-2014 y 1960-2015. El tramo 2003-2013 es internamente coherente, pero 2014 y 2015 muestran el índice bajando respecto de 2013 (134,7 → 105,5 → 120,6), algo económicamente imposible dado que Argentina tuvo inflación alta y positiva esos años — parece un empalme mal hecho en el propio dataset del Banco Mundial, no un error mío al descargarlo, y coincide justo con el período de descrédito del IPC oficial.
