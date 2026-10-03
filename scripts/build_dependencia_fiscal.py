@@ -1,58 +1,40 @@
 """
 Núcleo 4 — Peso de la coparticipación en las cuentas de Córdoba.
 
-Cruza la coparticipación nominal de Córdoba (Núcleo 1) con una proxy de sus ingresos
-corrientes totales (archivo de recaudación provincial, ver más abajo), calcula el ratio
-coparticipación / ingresos totales por año, y usa el simulador del Núcleo 3 para
-traducir un shock de recaudación coparticipable en un impacto sobre el ingreso
-provincial total.
+Fuente única para el ratio: `data/raw/ingresos_cordoba/serie_recaudacion_provincial.xlsx`
+(hoja "Serie_Mensual"), recaudación administrada por la Dirección General de Rentas de
+Córdoba. Se leen tres filas por su código:
 
-DEFINICIÓN DE "INGRESOS CORRIENTES TOTALES" USADA ACÁ (decisión documentada, confirmada
-con el usuario -- no es la única posible):
+  - `1`     Total (Recursos de Origen Provincial + Recursos de Origen Nacional). Es la
+            proxy de "ingresos corrientes totales": excluye lo recaudado por otros
+            organismos provinciales (p. ej., EPEC), según la nota al pie del archivo.
+  - `1.1`   Recursos de Origen Provincial (recaudación propia).
+  - `1.2.1` Coparticipación Federal de Impuestos: Ley 23.548 + compensación del
+            Consenso Fiscal (Ley 27.429) + bono Consenso Fiscal.
 
-Se usa la fila "Total" de `data/raw/ingresos_cordoba/serie_recaudacion_provincial.xlsx`
-(hoja "Serie_Mensual"): Recursos de Origen Provincial + Recursos de Origen Nacional,
-administrados por la Dirección General de Rentas de Córdoba. Esto **excluye** lo
-recaudado por otros organismos públicos provinciales (p. ej., EPEC), según la propia
-nota al pie del archivo fuente -- por lo tanto NO es el ingreso corriente total del
-sector público provincial en sentido estricto de ejecución presupuestaria, sino la
-mejor proxy disponible. Ver docs/methodology.md para el detalle completo.
+RATIO (`ratio_coparticipacion_ingresos`) = fila 1.2.1 / fila 1: numerador y denominador
+del mismo archivo, así el numerador es efectivamente parte del denominador. Da igual en
+pesos nominales o reales (el deflactor se cancela).
 
-UNIDADES: el archivo fuente rotula sus valores como "millones de pesos corrientes",
-pero son en realidad PESOS corrientes (verificado cruzando la fila de coparticipación
-del archivo contra el Núcleo 1 -- ver docs/methodology.md).
+CONTROL CONTRA LA SERIE NACIONAL: `coparticipacion_ron_pesos` es la coparticipación de
+Córdoba según la serie RON de Hacienda (Núcleo 1) y `diferencia_ron_vs_provincia` su
+diferencia relativa contra la fila 1.2.1. Coinciden en 2015-2017; desde 2018 la serie
+nacional es entre 14% y 17% más alta. No identifiqué la causa (podría ser criterio de
+registro o retenciones previas a la transferencia), así que no se usa para el ratio y se
+deja visible como control.
 
-RATIO (`ratio_coparticipacion_ingresos`): se calcula `monto_nominal / ingresos_totales`
-(nominal sobre nominal, mismo año). Esto es intencional y no cambia si se recalcula en
-pesos reales: al deflactar numerador y denominador por el mismo IPC del mismo año, el
-factor de deflactación se cancela en la división -- `(nominal_num / ipc) /
-(nominal_den / ipc) == nominal_num / nominal_den`. Por eso el ratio no tiene una
-versión "real" distinta; lo que sí aporta información nueva es ver el NIVEL de cada
-serie en pesos constantes (ver columnas reales abajo), que el ratio por sí solo no deja
-ver (una dependencia estable en % puede convivir con una recaudación real creciendo o
-cayendo).
+COLUMNAS REALES (`*_real_base2016_pesos`): pesos constantes, base promedio 2016 = 100,
+mismo IPC empalmado que el Núcleo 1 (`load_ipc_empalmado`):
+`real = nominal × (ipc_2016 / ipc_año)`.
 
-COLUMNAS REALES (`coparticipacion_real_base2016_pesos`,
-`ingresos_totales_real_base2016_pesos`): pesos constantes, base = promedio 2016 = 100,
-misma base y misma fuente de IPC que usa el Núcleo 1 (`load_ipc_empalmado` en
-`process_coparticipacion.py`). La de coparticipación se reutiliza directo de
-`monto_real_base2016` en `data/processed/coparticipacion_real.csv` (ya calculada ahí,
-no se recalcula acá); la de ingresos totales se deflacta acá mismo con la misma
-fórmula: `monto_real = monto_nominal × (ipc_promedio_2016 / ipc_promedio_año)`.
+UNIDADES: el archivo rotula sus valores como "millones de pesos corrientes", pero están
+en PESOS corrientes (la fila de coparticipación coincide en pesos con la serie RON en
+2015-2017; ver docs/methodology.md).
 
-ALCANCE: 2015-2025 (11 años), intersección entre lo que cubre el archivo de recaudación
-provincial (desde ene-2015) y el Núcleo 1 (hasta 2025). 2026 queda afuera del ratio
-anual por ser un año calendario incompleto en ambas fuentes.
+ALCANCE: 2015-2025. El archivo arranca en enero de 2015; 2026 queda afuera por ser un
+año incompleto.
 
-Entradas:
-  - data/processed/coparticipacion_real.csv (Núcleo 1)
-  - data/raw/ingresos_cordoba/serie_recaudacion_provincial.xlsx (hoja Serie_Mensual)
-
-Salida:
-  - data/processed/dependencia_fiscal_cordoba.csv
-    columnas: anio, coparticipacion_nominal_pesos, ingresos_totales_pesos,
-    ratio_coparticipacion_ingresos, coparticipacion_real_base2016_pesos,
-    ingresos_totales_real_base2016_pesos
+Salida: data/processed/dependencia_fiscal_cordoba.csv
 """
 import sys
 from pathlib import Path
@@ -93,110 +75,113 @@ def _parse_fecha_columna(valor):
     return 2000 + int(anio_str), MESES[mes_str]
 
 
-def load_ingresos_totales_anuales() -> pd.DataFrame:
-    """Suma la fila "Total" de Serie_Mensual a nivel de año calendario completo."""
+FILAS_DGR = {
+    "ingresos_totales_pesos": "1",
+    "recursos_propios_pesos": "1.1",
+    "coparticipacion_pesos": "1.2.1",
+}
+
+
+def load_series_dgr_anuales() -> pd.DataFrame:
+    """Suma por año calendario completo las filas de FILAS_DGR de Serie_Mensual."""
     raw = pd.read_excel(INGRESOS_PATH, sheet_name="Serie_Mensual", header=None)
+    codigos = raw[0].astype(str).str.strip()
 
-    fila_total = raw[raw[1].astype(str).str.strip() == "Total"].index
-    if len(fila_total) != 1:
-        raise SystemExit(
-            f"Se esperaba una única fila 'Total' en Serie_Mensual, se encontraron "
-            f"{len(fila_total)}. Revisar manualmente el archivo."
-        )
-    fila_total = int(fila_total[0])
-
-    fila_fechas = 2  # fila 3 de la hoja (0-indexed = 2)
+    fila_fechas = 2  # fila 3 de la hoja
     columnas_datos = [c for c in raw.columns if c >= 2]
 
-    montos_por_anio = {}
+    series = {}
     meses_por_anio = {}
-    for c in columnas_datos:
-        fecha_cruda = raw.iat[fila_fechas, c]
-        if fecha_cruda is None:
-            continue
-        anio, _mes = _parse_fecha_columna(fecha_cruda)
-        monto = raw.iat[fila_total, c]
-        if monto is None:
-            continue
-        montos_por_anio[anio] = montos_por_anio.get(anio, 0.0) + float(monto)
-        meses_por_anio[anio] = meses_por_anio.get(anio, 0) + 1
+    for columna_salida, codigo in FILAS_DGR.items():
+        filas = codigos[codigos == codigo].index
+        if len(filas) != 1:
+            raise SystemExit(
+                f"Se esperaba una única fila con código {codigo} en Serie_Mensual, se "
+                f"encontraron {len(filas)}. Revisar manualmente el archivo."
+            )
+        fila = int(filas[0])
 
-    anios_incompletos = [a for a, m in meses_por_anio.items() if m < 12]
+        montos = {}
+        meses = {}
+        for c in columnas_datos:
+            fecha_cruda = raw.iat[fila_fechas, c]
+            if pd.isna(fecha_cruda):
+                continue
+            anio, _mes = _parse_fecha_columna(fecha_cruda)
+            monto = raw.iat[fila, c]
+            if pd.isna(monto):
+                monto = 0.0
+            montos[anio] = montos.get(anio, 0.0) + float(monto)
+            meses[anio] = meses.get(anio, 0) + 1
+        series[columna_salida] = montos
+        meses_por_anio = meses
+
+    anios_incompletos = sorted(a for a, m in meses_por_anio.items() if m < 12)
     if anios_incompletos:
         print(
-            f"AVISO: años con menos de 12 meses de datos (se descartan del ratio anual, "
-            f"no se completan con supuestos): {sorted(anios_incompletos)}"
+            f"AVISO: años con menos de 12 meses de datos (se descartan, no se completan "
+            f"con supuestos): {anios_incompletos}"
         )
 
-    filas = [
-        {"anio": anio, "ingresos_totales_pesos": monto}
-        for anio, monto in montos_por_anio.items()
-        if meses_por_anio[anio] == 12
-    ]
-    return pd.DataFrame(filas).sort_values("anio").reset_index(drop=True)
+    df = pd.DataFrame(series)
+    df.index.name = "anio"
+    df = df.reset_index()
+    df = df[df["anio"].map(meses_por_anio) == 12]
+    return df.sort_values("anio").reset_index(drop=True)
 
 
 def build_ratio() -> pd.DataFrame:
-    copart = pd.read_csv(COPART_PATH)
-    copart_cordoba = copart[copart["provincia"] == "Córdoba"][
-        ["anio", "monto_nominal", "monto_real_base2016"]
-    ].copy()
-    copart_cordoba["coparticipacion_nominal_pesos"] = copart_cordoba["monto_nominal"] * 1e6
-    copart_cordoba["coparticipacion_real_base2016_pesos"] = (
-        copart_cordoba["monto_real_base2016"] * 1e6
-    )
-    copart_cordoba = copart_cordoba.drop(columns=["monto_nominal", "monto_real_base2016"])
+    df = load_series_dgr_anuales()
+    df = df[(df["anio"] >= SCOPE_START_YEAR) & (df["anio"] <= SCOPE_END_YEAR)].copy()
 
-    ingresos = load_ingresos_totales_anuales()
+    faltantes = set(range(SCOPE_START_YEAR, SCOPE_END_YEAR + 1)) - set(df["anio"])
+    if faltantes:
+        print(
+            f"AVISO: faltan {len(faltantes)} años en 2015-2025 (quedan ausentes en la "
+            f"salida): {sorted(faltantes)}"
+        )
+
+    df["ratio_coparticipacion_ingresos"] = df["coparticipacion_pesos"] / df["ingresos_totales_pesos"]
+    df["participacion_recursos_propios"] = df["recursos_propios_pesos"] / df["ingresos_totales_pesos"]
 
     ipc = load_ipc_empalmado()
     ipc_2016 = float(ipc.loc[ipc["anio"] == 2016, "ipc_promedio_anual"].iloc[0])
-    ingresos = ingresos.merge(ipc, on="anio", how="left")
-    ingresos["ingresos_totales_real_base2016_pesos"] = ingresos["ingresos_totales_pesos"] * (
-        ipc_2016 / ingresos["ipc_promedio_anual"]
-    )
-    ingresos = ingresos.drop(columns=["ipc_promedio_anual"])
+    df = df.merge(ipc, on="anio", how="left")
+    if df["ipc_promedio_anual"].isna().any():
+        raise SystemExit("Falta IPC para algún año del alcance; no se deflacta con supuestos.")
+    for col in ["ingresos_totales_pesos", "recursos_propios_pesos", "coparticipacion_pesos"]:
+        df[col.replace("_pesos", "_real_base2016_pesos")] = df[col] * ipc_2016 / df["ipc_promedio_anual"]
+    df = df.drop(columns=["ipc_promedio_anual"])
 
-    combinado = copart_cordoba.merge(ingresos, on="anio", how="inner")
-    combinado = combinado[
-        (combinado["anio"] >= SCOPE_START_YEAR) & (combinado["anio"] <= SCOPE_END_YEAR)
-    ]
+    copart_ron = pd.read_csv(COPART_PATH)
+    copart_ron = copart_ron[copart_ron["provincia"] == "Córdoba"][["anio", "monto_nominal"]]
+    copart_ron["coparticipacion_ron_pesos"] = copart_ron["monto_nominal"] * 1e6
+    df = df.merge(copart_ron.drop(columns="monto_nominal"), on="anio", how="left")
+    df["diferencia_ron_vs_provincia"] = df["coparticipacion_ron_pesos"] / df["coparticipacion_pesos"] - 1
 
-    anios_esperados = set(range(SCOPE_START_YEAR, SCOPE_END_YEAR + 1))
-    anios_presentes = set(combinado["anio"])
-    faltantes = anios_esperados - anios_presentes
-    if faltantes:
-        print(
-            f"AVISO: faltan {len(faltantes)} años en el cruce 2015-2025 (no se completan "
-            f"con supuestos, quedan ausentes en la salida): {sorted(faltantes)}"
-        )
+    return df.sort_values("anio").reset_index(drop=True)
 
-    combinado["ratio_coparticipacion_ingresos"] = (
-        combinado["coparticipacion_nominal_pesos"] / combinado["ingresos_totales_pesos"]
-    )
-    return combinado.sort_values("anio").reset_index(drop=True)
+
+def base_calibrada_cordoba(anio_referencia: int) -> tuple[float, float, float]:
+    """Masa coparticipable total implícita, coparticipación e ingresos totales de Córdoba.
+
+    La masa se calibra para que el coeficiente de Córdoba aplicado sobre ella reproduzca
+    exactamente la coparticipación que registra el archivo provincial en
+    `anio_referencia`. Así, el impacto en pesos que devuelve `simular_shock` y el
+    denominador (ingresos totales) salen de la misma fuente.
+    """
+    ratio_df = build_ratio()
+    fila = ratio_df.loc[ratio_df["anio"] == anio_referencia].iloc[0]
+    coparticipacion = float(fila["coparticipacion_pesos"])
+    ingresos_totales = float(fila["ingresos_totales_pesos"])
+    recaudacion_base = coparticipacion / COEFICIENTES_COPARTICIPACION["Córdoba"]
+    return recaudacion_base, coparticipacion, ingresos_totales
 
 
 def calcular_sensibilidad(anio_referencia: int, escenarios: list[float]) -> pd.DataFrame:
     """Traduce shocks de recaudación coparticipable (Núcleo 3) en impacto % sobre el
-    ingreso provincial total de Córdoba, usando el año de referencia indicado.
-
-    La masa coparticipable base se estima igual que en el Núcleo 3 (notebook de
-    validación contra una cifra pública de recaudación): "gross-up" de la
-    coparticipación nominal efectivamente recibida
-    por las 24 jurisdicciones en `anio_referencia`, dividiendo por la suma de sus 24
-    coeficientes (porque esos coeficientes representan solo la porción de la masa total
-    que va a las provincias, el resto es Nación + Fondo ATN).
-    """
-    copart = pd.read_csv(COPART_PATH)
-    total_recibido_provincias = copart[copart["anio"] == anio_referencia]["monto_nominal"].sum() * 1e6
-    suma_coeficientes = sum(COEFICIENTES_COPARTICIPACION.values())
-    recaudacion_base = total_recibido_provincias / suma_coeficientes
-
-    ratio_df = build_ratio()
-    ingresos_totales_referencia = float(
-        ratio_df.loc[ratio_df["anio"] == anio_referencia, "ingresos_totales_pesos"].iloc[0]
-    )
+    ingreso provincial total de Córdoba en `anio_referencia`."""
+    recaudacion_base, _copart, ingresos_totales = base_calibrada_cordoba(anio_referencia)
 
     filas = []
     for variacion in escenarios:
@@ -204,12 +189,11 @@ def calcular_sensibilidad(anio_referencia: int, escenarios: list[float]) -> pd.D
         impacto_cordoba = next(
             p["impacto_pesos"] for p in resultado["por_provincia"] if p["provincia"] == "Córdoba"
         )
-        impacto_pct_ingresos_totales = impacto_cordoba / ingresos_totales_referencia
         filas.append(
             {
                 "variacion_pct_recaudacion": variacion,
                 "impacto_copart_cordoba_pesos": impacto_cordoba,
-                "impacto_pct_ingresos_totales_cordoba": impacto_pct_ingresos_totales,
+                "impacto_pct_ingresos_totales_cordoba": impacto_cordoba / ingresos_totales,
             }
         )
     return pd.DataFrame(filas)

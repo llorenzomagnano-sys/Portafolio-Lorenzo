@@ -30,8 +30,7 @@ sys.path.insert(0, str(BASE_DIR / "scripts"))
 
 from simulator import simular_shock  # noqa: E402
 from coeficientes_ley23548 import COEFICIENTES_COPARTICIPACION  # noqa: E402
-from process_coparticipacion import load_ron_nominal  # noqa: E402
-from build_dependencia_fiscal import build_ratio  # noqa: E402
+from build_dependencia_fiscal import base_calibrada_cordoba  # noqa: E402
 
 OUTPUT_PATH = BASE_DIR / "output" / "figures" / "simulador_interactivo_demo.gif"
 
@@ -45,7 +44,7 @@ SURFACE = "#fcfcfb"
 
 RANGO_METER = 15  # el meter cubre -15% a +15%
 
-# Recorrido del "arrastre del slider": 0 -> -15 -> +10 -> -8.6 (el escenario validado) -> 0.
+# Recorrido del "arrastre del slider": 0 -> -15 -> +10 -> -8.6 (escenario de comienzos de 2026) -> 0.
 # Se interpola entre estos puntos para que la animación se sienta fluida, no a saltos.
 KEYFRAMES_PCT = [0, -15, 10, -8.6, 0]
 PASOS_POR_TRAMO = 18
@@ -62,14 +61,15 @@ def variaciones_interpoladas() -> list[float]:
 
 
 def datos_base() -> tuple[float, float]:
-    """(recaudacion_base anual estimada 2025, ingresos corrientes totales de Córdoba 2025)."""
-    nominal = load_ron_nominal()
-    total_2025 = nominal[nominal["anio"] == 2025]["monto_nominal"].sum() * 1e6
-    recaudacion_base = total_2025 / sum(COEFICIENTES_COPARTICIPACION.values())
-
-    ratio_df = build_ratio()
-    ingresos_2025 = float(ratio_df.loc[ratio_df["anio"] == 2025, "ingresos_totales_pesos"].iloc[0])
+    """(masa coparticipable calibrada 2025, ingresos totales de Córdoba 2025), misma
+    calibración que el indicador de sensibilidad del Núcleo 4."""
+    recaudacion_base, _copart, ingresos_2025 = base_calibrada_cordoba(2025)
     return recaudacion_base, ingresos_2025
+
+
+def _ar(texto: str) -> str:
+    """Formato numérico argentino: punto para miles, coma para decimales."""
+    return texto.replace(",", "§").replace(".", ",").replace("§", ".")
 
 
 def render_frame(variacion_pct: float, recaudacion_base: float, ingresos_totales: float) -> Image.Image:
@@ -94,22 +94,22 @@ def render_frame(variacion_pct: float, recaudacion_base: float, ingresos_totales
         family="sans-serif",
     )
     ax.text(
-        0.07, 0.80, f"Shock de recaudación nacional coparticipable: {variacion_pct:+.1f}%",
+        0.07, 0.80, _ar(f"Shock de recaudación nacional coparticipable: {variacion_pct:+.1f}%"),
         fontsize=11, color=INK_SECONDARY, ha="left", va="center",
     )
 
     # Stat tile: el número grande es el impacto relativo (la pregunta que importa:
     # "qué tan grave es esto para Córdoba"), con el delta en pesos como contexto.
     ax.text(
-        0.07, 0.58, f"{impacto_pct_ingresos:+.2%}", fontsize=44, color=color,
+        0.07, 0.58, _ar(f"{impacto_pct_ingresos:+.2%}"), fontsize=44, color=color,
         fontweight="bold", ha="left", va="center", family="sans-serif",
     )
     ax.text(
-        0.07, 0.40, "de los ingresos corrientes totales de Córdoba (2025)",
+        0.07, 0.40, "de los ingresos totales de Córdoba (2025)",
         fontsize=10.5, color=INK_SECONDARY, ha="left", va="center",
     )
     ax.text(
-        0.07, 0.32, f"{'−' if impacto_pesos < 0 else '+'}${abs(impacto_pesos) / 1e9:,.1f} mil millones de coparticipación".replace(",", "."),
+        0.07, 0.32, _ar(f"{'−' if impacto_pesos < 0 else '+'}${abs(impacto_pesos) / 1e9:,.1f} mil millones de coparticipación"),
         fontsize=10.5, color=INK_MUTED, ha="left", va="center",
     )
 
