@@ -6,7 +6,8 @@ Corre el pipeline completo del proyecto de punta a punta, con un solo comando:
 
 Pasos:
   1. Procesamiento (Núcleo 1, 2 y 4): genera los CSV de data/processed/.
-  2. Tests automáticos del simulador (Núcleo 3).
+  2. Tests automáticos: simulador (Núcleo 3) y chequeos de consistencia de los datos
+     procesados (IPC, participaciones, ratio de dependencia).
   3. Regeneración de los 4 notebooks (ejecuta cada uno de punta a punta con
      `jupyter nbconvert`, lo que a su vez regenera todas las figuras de
      output/figures/).
@@ -56,8 +57,8 @@ def main() -> None:
         run(descripcion, [sys.executable, script], cwd=SCRIPTS_DIR)
 
     run(
-        "Núcleo 3 — tests automáticos del simulador",
-        [sys.executable, "-m", "pytest", "test_simulator.py", "-v"],
+        "Tests: simulador (Núcleo 3) y consistencia del procesamiento (Núcleos 1, 2 y 4)",
+        [sys.executable, "-m", "pytest", "test_simulator.py", "test_procesamiento.py", "-v"],
         cwd=SCRIPTS_DIR,
     )
 
