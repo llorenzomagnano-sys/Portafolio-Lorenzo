@@ -28,7 +28,12 @@ SUPUESTOS (documentados acá y en docs/methodology.md):
    según su coeficiente, aunque el momento en que efectivamente cobra ese dinero pueda
    variar por este tipo de mecanismos de adelanto.
 
-4. El shock se aplica de forma proporcional y simultánea a toda la masa coparticipable
+4. El modelo es lineal y proporcional: en % de lo que le corresponde por coeficiente,
+   todas las provincias pierden exactamente lo mismo. Comparar contra lo que cada una
+   cobró efectivamente muestra diferencias, pero vienen de que lo cobrado no sigue
+   exactamente los coeficientes legales, no de una exposición distinta.
+
+5. El shock se aplica de forma proporcional y simultánea a toda la masa coparticipable
    -- no distingue por tipo de impuesto (IVA, Ganancias, Bienes Personales, etc.),
    aunque en la práctica una caída de recaudación puede afectar de forma desigual a los
    distintos impuestos que componen la masa coparticipable.
