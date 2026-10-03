@@ -1,0 +1,40 @@
+# data/raw — trazabilidad de fuentes
+
+Esta carpeta tiene los datos crudos, tal como los conseguí. Nunca se editan a mano. Cada subcarpeta corresponde a una fuente y tiene su propio `_metadata.json` con el origen exacto de cada archivo.
+
+## Fuentes
+
+| Fuente | Carpeta | Núcleo(s) |
+|---|---|---|
+| Coparticipación / RON — Secretaría de Hacienda | `coparticipacion/` | 1, 3 |
+| IPC — INDEC y Fundación Norte y Sur / Ferreres | `ipc/` | 1, 4 |
+| PBG por provincia — CEPAL | `pbg/` | 2 |
+| Coeficientes de coparticipación | `coeficientes/` | 2, 3 |
+| Recaudación de Córdoba — Dirección General de Rentas | `ingresos_cordoba/` | 4 |
+
+### Cómo los conseguí
+
+Todos los archivos los descargué o los conseguí a mano y los versioné acá tal cual, así el proyecto se puede reproducir sin acceso a internet. Cada `_metadata.json` anota de dónde salió cada archivo y cuándo lo incorporé.
+
+### Coparticipación federal / Recursos de Origen Nacional (RON)
+
+- **Organismo**: Secretaría de Hacienda, Ministerio de Economía de la Nación.
+- **URL de origen**: <https://www.argentina.gob.ar/economia/sechacienda/asuntosprovinciales/ron>
+- **Archivo usado**: `coparticipacion/serie_ron_2003_2025.csv` — 2003 a 2025, un registro por provincia/año/concepto (20 conceptos distintos de RON, no solo coparticipación Ley 23.548). Qué conceptos uso exactamente para este núcleo está detallado en `docs/methodology.md`.
+- **Contexto normativo**: distribución automática y diaria bajo el régimen de la Ley 23.548 (1988) y modificaciones posteriores (por ejemplo, la compensación por el Consenso Fiscal desde 2018). El archivo agrega esa distribución diaria a nivel anual.
+
+### Índice de Precios al Consumidor (IPC)
+
+- **2016-2025 — INDEC**: `ipc/serie_ipc_divisiones.csv` — Region="Nacional", Nivel General, cobertura mensual desde diciembre de 2016. El IPC oficial de Argentina no tiene cobertura confiable antes de esa fecha con las fuentes a las que pude acceder directamente de INDEC (el detalle está en `docs/methodology.md`, en la parte sobre la confiabilidad del IPC oficial en 2007-2015).
+- **2003-2015 — Fundación Norte y Sur / Orlando Ferreres**: `ipc/fundacion_norte_y_sur_orlando_ferreres.xlsx`, hoja `IPC `, conseguida en forma directa (sin URL pública de origen verificada). La uso para empalmar el IPC hacia atrás desde 2016: el tramo 2004-2006 sale de la tabla "GBA (INDEC)" (pre-intervención, confiable), y el tramo 2007-2016 de la tabla "GBA (estimaciones privadas)" (reemplaza al IPC oficial de esos años, bastante desacreditado por la intervención del INDEC). El método exacto, y una limitación que no pude resolver sobre una nota del archivo ("Ver metodología" sin hoja de metodología adjunta), están en `docs/methodology.md`.
+- Con este empalme, el Núcleo 1 pasó de cubrir 2016-2025 a cubrir 2003-2025. No llega a 1990 porque no encontré ninguna fuente de montos nominales de coparticipación anterior a 2003 (ver la sección de RON arriba).
+
+### Recaudación de Córdoba (Núcleo 4)
+
+- **Organismo**: Dirección General de Rentas de la Provincia de Córdoba (archivo que ya tenía armado de antes).
+- **Archivo usado**: `ingresos_cordoba/serie_recaudacion_provincial.xlsx` (nombre original: `Serie-recaudacion-provincial_Ene15-Ago26.xlsx`), hoja `Serie_Mensual`: recaudación mensual por concepto, enero 2015 a agosto 2026. Para el Núcleo 4 uso solo años calendario completos, 2015-2025, y tres filas: el total, los recursos de origen provincial y la coparticipación federal.
+- **Limitación de alcance**: el total excluye lo recaudado por otros organismos públicos provinciales (por ejemplo, EPEC), según la nota al pie del archivo. El detalle, incluida la corrección de unidades (el archivo dice "millones de pesos" pero son pesos), está en `docs/methodology.md`.
+
+## Otros archivos en esta carpeta
+
+`coparticipacion/serie_ron_2003_2025.xlsx` es el mismo contenido que el CSV, que es el que se usa. `ipc/serie_ipc_aperturas.csv` e `ipc/ipc_transicion_abr_nov_2016.xls` son descargas de INDEC que evalué y no usé; el motivo de cada una está en `ipc/_metadata.json`.

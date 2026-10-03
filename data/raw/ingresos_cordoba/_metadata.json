@@ -1,0 +1,18 @@
+{
+  "obtenido_por": "archivo propio, armado con anterioridad a este proyecto",
+  "fecha_incorporacion_al_repo": "2026-09-12",
+  "archivos": [
+    {
+      "archivo": "serie_recaudacion_provincial.xlsx",
+      "fuente": "Recaudación administrada por la Dirección General de Rentas de la Provincia de Córdoba (probablemente republicada por la Dirección General de Estadística y Censos de Córdoba; no encontré una URL pública estable del archivo)",
+      "descripcion": "Serie mensual (hoja 'Serie_Mensual') y acumulada (hoja 'Serie_Acum', no usada: los totales anuales se recalculan desde Serie_Mensual) de recaudación por concepto, enero 2015 a agosto 2026. Se usan tres filas por código: 1 (Total = Recursos de Origen Provincial + Recursos de Origen Nacional), 1.1 (Recursos de Origen Provincial) y 1.2.1 (Coparticipación Federal de Impuestos).",
+      "cobertura": "enero 2015 - agosto 2026 (mensual); para el Núcleo 4 se usan años calendario completos, 2015-2025 (2026 queda incompleto)",
+      "unidades": "El encabezado de ambas hojas dice \"Millones de pesos corrientes\", pero los valores están en PESOS corrientes. Verificado con la fila de coparticipación: en 2015-2017 coincide con la serie de Hacienda del Núcleo 1, expresada en pesos, con diferencias menores al 0,2% (2015: $23.709.952.851 contra $23.673.039.600).",
+      "limitacion_de_alcance": "La nota al pie (1) de la hoja 'Referencias' aclara: \"Se incluye en esta clasificación sólo los recursos provinciales en los que la Dirección General de Rentas es la encargada de su recaudación. Se excluyen aquellos recaudados por otras entidades públicas provinciales, por ejemplo, el Fondo para el Desarrollo Energético Provincial recaudado por EPEC.\" Es decir, la fila 'Total' NO es el ingreso corriente total del sector público provincial en sentido de ejecución presupuestaria -- excluye lo recaudado por EPEC y otros organismos descentralizados. Se usa igual como la mejor proxy disponible.",
+      "problema_de_formato_detectado": "La columna de fecha correspondiente a diciembre de 2023 está guardada como texto ('dic-23') en vez de una fecha real, a diferencia de todas las demás columnas. scripts/build_dependencia_fiscal.py la parsea aparte.",
+      "usado_en_nucleo_4": true,
+      "uso": "Núcleo 4: numerador (fila 1.2.1) y denominador (fila 1) del ratio de dependencia, y recaudación propia (fila 1.1) en pesos constantes",
+      "nombre_original": "Serie-recaudacion-provincial_Ene15-Ago26.xlsx"
+    }
+  ]
+}
