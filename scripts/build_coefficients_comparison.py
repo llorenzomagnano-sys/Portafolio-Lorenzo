@@ -1,24 +1,22 @@
 """
 Núcleo 2 — Compara, para cada provincia, cuánto "aporta" (proxy: % de su PBG sobre el
-PBG total del país) contra cuánto "recibe" (% de la masa coparticipable total según el
-coeficiente de distribución de la Ley 23.548).
+PBG total del país) contra cuánto "recibe" (% de lo que se reparte entre las 24
+jurisdicciones según los coeficientes de la Ley 23.548).
 
-IMPORTANTE (ver docs/methodology.md para el detalle completo):
-- Los coeficientes de coparticipación son los de la Ley 23.548 (1988), tal como figuran
-  en data/raw/coeficientes/indices_copa_2018.pdf, con UN solo ajuste manual: el valor de
-  CABA se reemplazó por 1,4% (vigente desde 2020), en vez del 3,75% que tenía ese
-  documento de 2018.
-- Esos 24 coeficientes NO se renormalizan para sumar 1 -- se usan tal cual, como
-  fracción de la masa coparticipable TOTAL (que incluye lo que retiene la Nación y el
-  Fondo ATN). El % de PBG también es una fracción de un total nacional (el PBG país).
-  Ambas columnas son fracciones de "totales nacionales" distintos, no partes de un
-  mismo pastel -- la comparación es de orden de magnitud, no una relación exacta 1 a 1.
-- El PBG usado es el de 2024 (el año más reciente disponible en la fuente), marcado
-  como dato preliminar en el archivo original.
-- Esto usa el PBG como PROXY del aporte tributario real -- tiene una limitación
-  metodológica conocida y documentada: las grandes empresas suelen tributar donde
-  tienen sede fiscal (muchas veces CABA), no necesariamente donde generan la actividad
-  económica. Ver la sección de limitaciones en el notebook y en methodology.md.
+Notas (detalle completo en docs/methodology.md):
+- Coeficientes de la Ley 23.548 tal como figuran en
+  data/raw/coeficientes/indices_copa_2018.pdf, con un solo ajuste: CABA en 1,4% (régimen
+  automático vigente desde 2020) en vez del 3,75% de ese documento de 2018. Por una
+  cautelar de la Corte Suprema (dic-2022), Nación le transfiere aparte otro 1,55%; eso
+  queda fuera del coeficiente y se discute en el notebook.
+- Los 24 coeficientes suman ~0,59 de la masa coparticipable total (el resto es Nación y
+  el Fondo ATN). Para comparar contra el PBG, que suma 100% entre provincias, se
+  renormalizan: `pct_coparticipacion_entre_provincias = coef / suma(coefs)`. Sin ese
+  paso, toda provincia queda con brecha negativa en proporción a su tamaño y el ranking
+  mide escala, no reparto.
+- PBG 2024 (el año más reciente de la fuente, preliminar).
+- El PBG es un PROXY del aporte tributario: las grandes empresas tributan donde tienen
+  sede fiscal (muchas veces CABA), no necesariamente donde generan la actividad.
 """
 import sys
 from pathlib import Path
@@ -120,8 +118,11 @@ def main() -> None:
         )
     combinado = combinado.drop(columns="_merge")
 
+    combinado["pct_coparticipacion_entre_provincias"] = (
+        combinado["pct_coparticipacion_recibe"] / combinado["pct_coparticipacion_recibe"].sum()
+    )
     combinado["diferencia_pp"] = (
-        combinado["pct_coparticipacion_recibe"] - combinado["pct_pbg_aporte"]
+        combinado["pct_coparticipacion_entre_provincias"] - combinado["pct_pbg_aporte"]
     ) * 100
 
     combinado = combinado.sort_values("diferencia_pp", ascending=False).reset_index(drop=True)

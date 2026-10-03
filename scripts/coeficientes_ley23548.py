@@ -2,14 +2,15 @@
 Coeficientes de coparticipación (Ley 23.548) compartidos entre scripts del proyecto.
 
 Extraídos manualmente de data/raw/coeficientes/indices_copa_2018.pdf, página 2,
-columna "Coparticipación Federal (Ley 23548)". El valor de CABA fue ajustado
-manualmente de 0,0375 (original del documento, año 2018) a 0,014 (vigente desde 2020).
-Ver data/raw/coeficientes/_metadata.json y docs/methodology.md para el detalle
-completo de esta decisión.
+columna "Coparticipación Federal (Ley 23548)". El valor de CABA se ajustó de 0,0375
+(Decreto 194/2016, vigente cuando se hizo el documento) a 0,014 (régimen automático
+desde la Ley 27.606, 2020). El 1,55% adicional que Nación le transfiere a CABA desde la
+cautelar de la Corte Suprema (dic-2022) se paga por fuera de este coeficiente y no se
+incluye. Detalle en docs/methodology.md.
 
 No suman 1: representan el % de cada provincia sobre la masa coparticipable TOTAL
-(que incluye la porción que retiene la Nación y el Fondo ATN), no solo entre
-provincias. Ver docs/methodology.md, sección "por qué no se renormalizan".
+(que incluye la porción que retiene la Nación y el Fondo ATN). Para comparar entre
+provincias hay que renormalizarlos (ver build_coefficients_comparison.py).
 """
 
 COEFICIENTES_COPARTICIPACION = {
