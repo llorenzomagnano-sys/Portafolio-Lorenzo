@@ -1,6 +1,6 @@
 # Coparticipación federal: el caso de Córdoba
 
-[![CI](https://github.com/llorenzomagnano-sys/Portafolio-Lorenzo/actions/workflows/ci.yml/badge.svg)](https://github.com/llorenzomagnano-sys/Portafolio-Lorenzo/actions/workflows/ci.yml)
+[![CI](https://github.com/llorenzomagnano-sys/analisis-de-la-coparticipacion-federal-con-foco-en-cordoba/actions/workflows/ci.yml/badge.svg)](https://github.com/llorenzomagnano-sys/analisis-de-la-coparticipacion-federal-con-foco-en-cordoba/actions/workflows/ci.yml)
 
 Análisis de datos del régimen de coparticipación federal de impuestos en Argentina, con foco en la provincia de Córdoba.
 
@@ -50,7 +50,7 @@ Demo del simulador recorriendo distintos escenarios de shock, con el impacto com
 
 ![Demo del simulador mostrando el impacto como % de los ingresos totales de Córdoba](output/figures/simulador_interactivo_demo.gif)
 
-**[Probar el simulador en el navegador →](https://llorenzomagnano-sys.github.io/Portafolio-Lorenzo/simulador/)**: misma fórmula de `simular_shock`, reimplementada en JavaScript en una página estática (`docs/simulador/index.html`). Usa los datos de 2025 de este repositorio; el detalle con las 24 jurisdicciones está en el notebook.
+**[Probar el simulador en el navegador →](https://llorenzomagnano-sys.github.io/analisis-de-la-coparticipacion-federal-con-foco-en-cordoba/simulador/)**: misma fórmula de `simular_shock`, reimplementada en JavaScript en una página estática (`docs/simulador/index.html`). Usa los datos de 2025 de este repositorio; el detalle con las 24 jurisdicciones está en el notebook.
 
 ### Núcleo 4 — Peso de la coparticipación en las cuentas de Córdoba
 
@@ -95,8 +95,8 @@ Ninguna de estas fuentes tiene una licencia restrictiva conocida para este tipo 
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/llorenzomagnano-sys/Portafolio-Lorenzo.git
-cd Portafolio-Lorenzo
+git clone https://github.com/llorenzomagnano-sys/analisis-de-la-coparticipacion-federal-con-foco-en-cordoba.git
+cd analisis-de-la-coparticipacion-federal-con-foco-en-cordoba
 
 # Crear y activar un entorno virtual
 python -m venv venv
